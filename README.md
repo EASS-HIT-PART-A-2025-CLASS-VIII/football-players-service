@@ -1,16 +1,16 @@
-**Football Player Service**
+# ⚽ Football Player Service ⚽
 
-Deployed: https://football-players-service.onrender.com/docs
+Live demo & docs: <a href="https://football-players-service.onrender.com/docs" target="_blank" rel="noopener noreferrer">Football Player Service — interactive docs</a>
 
-**Intro**
+## Intro
 
 Small FastAPI app providing a simple in-memory CRUD for football players (list, create, get, update, delete). Built with `FastAPI`, `Pydantic` for validation, `uvicorn` as the server, and light `pytest` tests using `httpx`/TestClient. The code separates models, repository and app logic so persistence can be swapped easily.
 
-**1) Deployed version & quick link**
+## How to run it yourself
 
-- **Docs (deployed):** `https://football-players-service.onrender.com/docs`
+- **Docs (hosted):** <a href="https://football-players-service.onrender.com/docs" target="_blank" rel="noopener noreferrer">Interactive API docs (Render) ⚽</a>
 
-**2) Run locally (after clone)**
+**1) Run locally (after clone)**
 
 ```bash
 # Clone
@@ -24,14 +24,14 @@ uv sync --no-dev
 uv run uvicorn football_player_service.app.main:app --reload --port 8000
 ```
 
-**3) Run with Docker (after clone)**
+**2) OR Run with Docker (after clone)**
 
 ```bash
 docker build -t football-service -f football_player_service/Dockerfile .
 docker run --rm -p 8000:8000 --name football-service football-service
 ```
 
-**4) Run tests**
+**3) Run tests**
 
 Preferred command used in CI/local checks:
 
