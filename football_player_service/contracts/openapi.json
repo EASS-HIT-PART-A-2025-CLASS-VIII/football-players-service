@@ -278,6 +278,18 @@
             ],
             "title": "League"
           },
+          "market_value": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Market Value",
+            "default": 0
+          },
+          "age": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Age",
+            "default": 0
+          },
           "id": {
             "type": "integer",
             "title": "Id"
@@ -329,6 +341,18 @@
               }
             ],
             "title": "League"
+          },
+          "market_value": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Market Value",
+            "default": 0
+          },
+          "age": {
+            "type": "integer",
+            "minimum": 0.0,
+            "title": "Age",
+            "default": 0
           }
         },
         "type": "object",

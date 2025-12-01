@@ -26,6 +26,8 @@ def test_create_player_returns_201_and_payload(client):
 			"status": "active",
 			"current_team": "paris saint-germain",
 			"league": "ligue 1",
+			"age": 34,
+			"market_value": 80000000,
 		},
 	)
 	assert response.status_code == 201
@@ -36,17 +38,31 @@ def test_create_player_returns_201_and_payload(client):
 	assert payload["current_team"] == "Paris Saint-Germain"
 	assert payload["status"] == "active"
 	assert payload["id"] == 1
+	assert payload["age"] == 34
+	assert payload["market_value"] == 80000000
 
 
 def test_player_ids_increment(client):
 	"""Repository assigns sequential IDs."""
 	first = client.post(
 		"/players",
-		json={"full_name": "Kylian Mbappe", "country": "france", "status": "active"},
+		json={
+			"full_name": "Kylian Mbappe",
+			"country": "france",
+			"status": "active",
+			"age": 24,
+			"market_value": 160000000,
+		},
 	).json()["id"]
 	second = client.post(
 		"/players",
-		json={"full_name": "Neymar Jr", "country": "brazil", "status": "active"},
+		json={
+			"full_name": "Neymar Jr",
+			"country": "brazil",
+			"status": "active",
+			"age": 31,
+			"market_value": 90000000,
+		},
 	).json()["id"]
 	assert second == first + 1
 
@@ -62,7 +78,13 @@ def test_list_players_returns_created_player(client):
 	"""Can retrieve players after creating them."""
 	client.post(
 		"/players",
-		json={"full_name": "Erling Haaland", "country": "norway", "status": "active"},
+		json={
+			"full_name": "Erling Haaland",
+			"country": "norway",
+			"status": "active",
+			"age": 22,
+			"market_value": 60000000,
+		},
 	)
 
 	response = client.get("/players")
@@ -76,7 +98,13 @@ def test_get_player_by_id(client):
 	"""Can retrieve specific player by ID."""
 	create_response = client.post(
 		"/players",
-		json={"full_name": "Harry Kane", "country": "england", "status": "active"},
+		json={
+			"full_name": "Harry Kane",
+			"country": "england",
+			"status": "active",
+			"age": 30,
+			"market_value": 50000000,
+		},
 	)
 	player_id = create_response.json()["id"]
 
@@ -85,6 +113,8 @@ def test_get_player_by_id(client):
 	player = response.json()
 	assert player["full_name"] == "Harry Kane"
 	assert player["id"] == player_id
+	assert player["age"] == 30
+	assert player["market_value"] == 50000000
 
 
 def test_get_missing_player_returns_404(client):
@@ -98,7 +128,13 @@ def test_delete_player(client):
 	"""Can delete a player and it's gone afterwards."""
 	create_response = client.post(
 		"/players",
-		json={"full_name": "Sergio Ramos", "country": "spain", "status": "retired"},
+		json={
+			"full_name": "Sergio Ramos",
+			"country": "spain",
+			"status": "retired",
+			"age": 39,
+			"market_value": 1000000,
+		},
 	)
 	player_id = create_response.json()["id"]
 
