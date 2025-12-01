@@ -279,16 +279,21 @@
             "title": "League"
           },
           "market_value": {
-            "type": "integer",
-            "minimum": 0.0,
-            "title": "Market Value",
-            "default": 0
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Market Value"
           },
           "age": {
             "type": "integer",
             "minimum": 0.0,
-            "title": "Age",
-            "default": 0
+            "title": "Age"
           },
           "id": {
             "type": "integer",
@@ -300,6 +305,7 @@
           "full_name",
           "country",
           "status",
+          "age",
           "id"
         ],
         "title": "Player",
@@ -343,23 +349,29 @@
             "title": "League"
           },
           "market_value": {
-            "type": "integer",
-            "minimum": 0.0,
-            "title": "Market Value",
-            "default": 0
+            "anyOf": [
+              {
+                "type": "integer",
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Market Value"
           },
           "age": {
             "type": "integer",
             "minimum": 0.0,
-            "title": "Age",
-            "default": 0
+            "title": "Age"
           }
         },
         "type": "object",
         "required": [
           "full_name",
           "country",
-          "status"
+          "status",
+          "age"
         ],
         "title": "PlayerCreate",
         "description": "Incoming payload with validation + normalization rules."
