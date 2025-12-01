@@ -19,6 +19,8 @@ class PlayerBase(BaseModel):
     status: PlayingStatus
     current_team: Optional[str] = None
     league: Optional[str] = None
+    market_value: int = Field(0, ge=0)
+    age: int = Field(0, ge=0)
 
 class Player(PlayerBase):
     """Response model including server-generated ID.

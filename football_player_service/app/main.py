@@ -36,10 +36,12 @@ def create_player(
     """Create a new player."""
     player = repository.create(payload)
     logger.info(
-        "player.created id=%s name=%s status=%s",
+        "player.created id=%s name=%s status=%s age=%s market_value=%s",
         player.id,
         player.full_name,
         player.status,
+        player.age,
+        player.market_value,
     )
     return player
 
@@ -77,10 +79,12 @@ def update_player(
             detail="Player not found",
         )
     logger.info(
-        "player.updated id=%s name=%s status=%s",
+        "player.updated id=%s name=%s status=%s age=%s market_value=%s",
         updated.id,
         updated.full_name,
         updated.status,
+        updated.age,
+        updated.market_value,
     )
     return updated
 
