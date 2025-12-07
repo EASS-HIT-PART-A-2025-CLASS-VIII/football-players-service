@@ -7,6 +7,7 @@ Generates a JSON schema file that can be used for:
 - Contract testing (schemathesis, dredd)
 - Validation and monitoring
 """
+
 import json
 from pathlib import Path
 
@@ -29,9 +30,8 @@ print(f"Exported OpenAPI schema to {output_path}")
 print(f"  Title: {schema['info']['title']}")
 print(f"  Version: {schema['info']['version']}")
 print(f"  Endpoints: {len(schema['paths'])}")
-print(f"\nUse this file to:")
-print(f"  - Generate client SDKs (Python, TypeScript, Java, etc.)")
-print(f"  - Validate API responses in tests")
-print(f"  - Generate interactive documentation")
-print(f"  - Monitor API contract compliance")
-
+print("\nUse this file to:")
+print("  - Generate client SDKs (Python, TypeScript, Java, etc.)")
+print("  - Validate API responses in tests")
+print("  - Generate interactive documentation")
+print("  - Monitor API contract compliance")

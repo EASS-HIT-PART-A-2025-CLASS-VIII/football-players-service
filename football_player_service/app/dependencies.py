@@ -9,6 +9,7 @@ from .repository import PlayerRepository
 _settings = Settings()
 _repository = PlayerRepository()
 
+
 def get_settings() -> Settings:
     """Provide settings to endpoints."""
     return _settings
@@ -17,6 +18,7 @@ def get_settings() -> Settings:
 def get_repository() -> Generator[PlayerRepository, None, None]:
     """Provide repository to endpoints."""
     yield _repository
+
 
 SettingsDep = Annotated[Settings, Depends(get_settings)]
 RepositoryDep = Annotated[PlayerRepository, Depends(get_repository)]

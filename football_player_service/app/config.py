@@ -1,5 +1,6 @@
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+
 class Settings(BaseSettings):
     """Application settings loaded from environment variables."""
 
@@ -8,7 +9,7 @@ class Settings(BaseSettings):
     feature_preview: bool = False
 
     model_config = SettingsConfigDict(
-        env_file=".env",      # Load from .env file
-        env_prefix="PLAYER_", # Only read PLAYER_* variables
-        extra="ignore",       # Ignore unknown env vars
+        env_file=".env",  # Load from .env file
+        env_prefix="PLAYER_",  # Only read PLAYER_* variables
+        extra="ignore",  # Ignore unknown env vars
     )

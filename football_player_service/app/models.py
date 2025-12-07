@@ -4,16 +4,19 @@ from enum import Enum
 from typing import Optional
 from pydantic import BaseModel, Field, model_validator
 
+
 class PlayingStatus(str, Enum):
     ACTIVE = "active"
     RETIRED = "retired"
     FREE_AGENT = "free_agent"
+
 
 class PlayerBase(BaseModel):
     """Shared fields for both creating and returning players.
 
     This model stays stable even when the persistence layer changes.
     """
+
     full_name: str = Field(min_length=2)
     country: str = Field(min_length=2)
     status: PlayingStatus
@@ -22,13 +25,16 @@ class PlayerBase(BaseModel):
     market_value: Optional[int] = Field(None, ge=0)
     age: int = Field(..., ge=0)
 
+
 class Player(PlayerBase):
     """Response model including server-generated ID.
 
     When migrating to SQLModel, we will add `table=True`
     while keeping the HTTP contract unchanged.
     """
+
     id: int
+
 
 class PlayerCreate(PlayerBase):
     """Incoming payload with validation + normalization rules."""

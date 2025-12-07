@@ -12,6 +12,7 @@ app = FastAPI(
     version="0.1.0",
 )
 
+
 @app.get("/health", tags=["diagnostics"])
 def health(settings: SettingsDep) -> dict[str, str]:
     """Health check endpoint."""
@@ -22,6 +23,7 @@ def health(settings: SettingsDep) -> dict[str, str]:
 def list_players(repository: RepositoryDep) -> list[Player]:
     """Get all players."""
     return list(repository.list())
+
 
 @app.post(
     "/players",
