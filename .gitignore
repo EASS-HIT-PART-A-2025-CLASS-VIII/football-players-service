@@ -36,6 +36,9 @@ Thumbs.db
 .coverage
 htmlcov/
 
+# Linting
+.ruff_cache/
+
 # Distribution
 dist/
 build/

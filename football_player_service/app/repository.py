@@ -1,7 +1,5 @@
 # filepath: football_player_service/app/repository.py
-from __future__ import annotations
-
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 from .models import Player, PlayerCreate
 
@@ -21,6 +19,10 @@ class PlayerRepository:
         """Get all players."""
         return list(self._items.values())
 
+    def count(self) -> int:
+        """Get total count of players."""
+        return len(self._items)
+
     def create(self, payload: PlayerCreate) -> Player:
         """Add a new player and return it with assigned ID."""
         player = Player(id=self._next_id, **payload.model_dump())
@@ -28,11 +30,11 @@ class PlayerRepository:
         self._next_id += 1
         return player
 
-    def get(self, player_id: int) -> Player | None:
+    def get(self, player_id: int) -> Optional[Player]:
         """Get a player by ID, or None if not found."""
         return self._items.get(player_id)
 
-    def update(self, player_id: int, payload: PlayerCreate) -> Player | None:
+    def update(self, player_id: int, payload: PlayerCreate) -> Optional[Player]:
         """Replace an existing player. Returns updated player or None if not found."""
         existing = self._items.get(player_id)
         if existing is None:
