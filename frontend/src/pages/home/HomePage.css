@@ -217,7 +217,7 @@
 }
 
 .card-1 {
-  top: 10%;
+  top: 28%;
   right: 20%;
   animation-delay: 0s;
 }
@@ -322,6 +322,9 @@
 
   .features-section {
     grid-template-columns: 1fr;
+  }
+  .card-1 {
+    top: 8%;
   }
 }
 

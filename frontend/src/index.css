@@ -104,6 +104,48 @@ button:focus-visible {
   outline-offset: 2px;
 }
 
+/* Custom Scrollbar Styles */
+/* Webkit browsers (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg-secondary);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(
+    180deg,
+    var(--color-accent-neon),
+    var(--color-accent-electric)
+  );
+  border-radius: 10px;
+  border: 2px solid var(--color-bg-secondary);
+  transition: background 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(
+    180deg,
+    var(--color-accent-electric),
+    var(--color-accent-neon)
+  );
+  box-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+}
+
+::-webkit-scrollbar-thumb:active {
+  background: var(--color-accent-neon);
+}
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-accent-neon) var(--color-bg-secondary);
+}
+
 /* Utility Classes */
 .page-container {
   width: 100%;
