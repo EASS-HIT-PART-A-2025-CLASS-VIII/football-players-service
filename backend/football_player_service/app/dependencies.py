@@ -1,23 +1,21 @@
-from collections.abc import Generator
 from typing import Annotated
 
 from fastapi import Depends
+from sqlmodel import Session
 
 from .config import Settings
+from .database import get_session as get_db_session
 from .repository import PlayerRepository
-
-_settings = Settings()
-_repository = PlayerRepository()
 
 
 def get_settings() -> Settings:
     """Provide settings to endpoints."""
-    return _settings
+    return Settings()
 
 
-def get_repository() -> Generator[PlayerRepository, None, None]:
+def get_repository(session: Session = Depends(get_db_session)) -> PlayerRepository:
     """Provide repository to endpoints."""
-    yield _repository
+    return PlayerRepository(session)
 
 
 SettingsDep = Annotated[Settings, Depends(get_settings)]

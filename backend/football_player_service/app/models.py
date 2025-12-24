@@ -1,7 +1,8 @@
 # filepath: football_player_service/app/models.py
 from enum import Enum
 from typing import Optional
-from pydantic import BaseModel, Field, model_validator
+from sqlmodel import SQLModel, Field
+from pydantic import field_validator
 
 # Validation constants
 MIN_FULL_NAME_LENGTH = 2
@@ -20,11 +21,8 @@ class PlayingStatus(str, Enum):
     FREE_AGENT = "free_agent"
 
 
-class PlayerBase(BaseModel):
-    """Shared fields for both creating and returning players.
-
-    This model stays stable even when the persistence layer changes.
-    """
+class PlayerBase(SQLModel):
+    """Shared fields for players."""
 
     full_name: str = Field(
         min_length=MIN_FULL_NAME_LENGTH,
@@ -63,40 +61,27 @@ class PlayerBase(BaseModel):
     )
 
 
-class Player(PlayerBase):
-    """Response model including server-generated ID.
+class Player(PlayerBase, table=True):
+    """Database model with auto-generated ID."""
 
-    When migrating to SQLModel, we will add `table=True`
-    while keeping the HTTP contract unchanged.
-    """
+    __tablename__ = "players"
 
-    id: int = Field(description="Unique player identifier (auto-generated)")
+    id: Optional[int] = Field(default=None, primary_key=True)
 
 
 class PlayerCreate(PlayerBase):
-    """Incoming payload with validation + normalization rules."""
+    """Incoming payload with normalization."""
 
-    @model_validator(mode="after")
-    def normalize_fields(self) -> "PlayerCreate":
-        """Normalize strings for consistency.
+    @field_validator("full_name", "country", "league", "current_team", mode="before")
+    @classmethod
+    def normalize_fields(cls, v):
+        """Normalize strings to title case."""
+        if isinstance(v, str):
+            return v.title()
+        return v
 
-        Examples:
-            - full_name: "lionel messi" → "Lionel Messi"
-            - country: "argentina" → "Argentina"
-            - league: "premier league" → "Premier League"
-            - current_team: "manchester city" → "Manchester City"
-        """
 
-        if self.full_name:
-            self.full_name = self.full_name.title()
+class PlayerResponse(PlayerBase):
+    """Response model matching Player but without table config."""
 
-        if self.country:
-            self.country = self.country.title()
-
-        if self.league:
-            self.league = self.league.title()
-
-        if self.current_team:
-            self.current_team = self.current_team.title()
-
-        return self
+    id: int

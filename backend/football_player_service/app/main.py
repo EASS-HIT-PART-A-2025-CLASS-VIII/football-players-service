@@ -10,6 +10,7 @@ from slowapi.errors import RateLimitExceeded
 
 from .dependencies import RepositoryDep, SettingsDep
 from .models import Player, PlayerCreate
+from .database import init_db
 
 logger = logging.getLogger("football-player-service")
 logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
@@ -22,6 +23,7 @@ limiter = Limiter(key_func=get_remote_address)
 async def lifespan(app: FastAPI):
     """Lifespan event handler for startup and shutdown."""
     # Startup
+    init_db()  # Create tables on startup
     logger.info("=" * 60)
     logger.info("⚽ Football Player Service v0.2.0")
     logger.info("=" * 60)
@@ -31,6 +33,7 @@ async def lifespan(app: FastAPI):
     logger.info("  ✓ CORS: Enabled (configure for production)")
     logger.info("  ✓ Health check: /health endpoint")
     logger.info("  ✓ API Documentation: /docs (Swagger UI)")
+    logger.info("  ✓ Database: SQLite (persistent)")
     logger.info("=" * 60)
     yield
     # Shutdown (if needed)

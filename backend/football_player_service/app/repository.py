@@ -1,54 +1,53 @@
 # filepath: football_player_service/app/repository.py
-from typing import Dict, List, Optional
-
+from typing import List, Optional
+from sqlmodel import Session, select, func
 from .models import Player, PlayerCreate
 
 
 class PlayerRepository:
-    """In-memory storage for football players.
+    """Database repository using SQLModel."""
 
-    You can swap in SQLModel + SQLite later without changing the
-    interface (list/create/get/update/delete), so routes stay the same.
-    """
-
-    def __init__(self) -> None:
-        self._items: Dict[int, Player] = {}
-        self._next_id = 1
+    def __init__(self, session: Session) -> None:
+        self.session = session
 
     def list(self) -> List[Player]:
         """Get all players."""
-        return list(self._items.values())
+        return self.session.exec(select(Player)).all()
 
     def count(self) -> int:
         """Get total count of players."""
-        return len(self._items)
+        return self.session.exec(select(func.count(Player.id))).one()
 
     def create(self, payload: PlayerCreate) -> Player:
-        """Add a new player and return it with assigned ID."""
-        player = Player(id=self._next_id, **payload.model_dump())
-        self._items[player.id] = player
-        self._next_id += 1
+        """Add a new player."""
+        player = Player(**payload.model_dump())
+        self.session.add(player)
+        self.session.commit()
+        self.session.refresh(player)
         return player
 
     def get(self, player_id: int) -> Optional[Player]:
-        """Get a player by ID, or None if not found."""
-        return self._items.get(player_id)
+        """Get a player by ID."""
+        return self.session.get(Player, player_id)
 
     def update(self, player_id: int, payload: PlayerCreate) -> Optional[Player]:
-        """Replace an existing player. Returns updated player or None if not found."""
-        existing = self._items.get(player_id)
-        if existing is None:
+        """Update a player."""
+        player = self.session.get(Player, player_id)
+        if not player:
             return None
 
-        updated = Player(id=player_id, **payload.model_dump())
-        self._items[player_id] = updated
-        return updated
+        player_data = payload.model_dump(exclude_unset=True)
+        for key, value in player_data.items():
+            setattr(player, key, value)
+
+        self.session.add(player)
+        self.session.commit()
+        self.session.refresh(player)
+        return player
 
     def delete(self, player_id: int) -> None:
-        """Remove a player by ID (no-op if it doesn't exist)."""
-        self._items.pop(player_id, None)
-
-    def clear(self) -> None:
-        """Remove all players (useful for tests)."""
-        self._items.clear()
-        self._next_id = 1
+        """Delete a player."""
+        player = self.session.get(Player, player_id)
+        if player:
+            self.session.delete(player)
+            self.session.commit()

@@ -21,6 +21,8 @@ uv run python -m uvicorn football_player_service.app.main:app --reload --port 80
 ## 🔧 Tech Stack
 
 - **FastAPI** (Python 3.13+)
+- **SQLModel** — Database ORM
+- **SQLite** (local) / **PostgreSQL** (production) — Flexible database backend
 - **Pydantic v2** — Validation
 - **pytest** — 21 comprehensive tests
 - **Docker** — Containerization
@@ -80,9 +82,18 @@ uv run pytest football_player_service/tests --cov=football_player_service --cov-
 
 **Coverage:** 21 tests — Happy path, validation, error handling, security
 
+### Test Architecture
+
+- **In-memory SQLite** — Tests use `cache=shared` in-memory database for speed & isolation
+- **Fixtures** (`conftest.py`) — Session-scoped test database, auto-cleanup between tests
+- **Full integration** — Tests cover HTTP → FastAPI → Repository → SQLite → Response
+- **No mocks** — Real database operations ensure behavior correctness
+
 ---
 
 ## 🐳 Docker
+
+### Local Development (In-Memory SQLite)
 
 ```bash
 # Build
@@ -90,6 +101,20 @@ docker build -t football-service -f backend/football_player_service/Dockerfile b
 
 # Run
 docker run --rm -p 8000:8000 football-service
+```
+
+Visit http://localhost:8000/docs
+
+**Note:** Uses in-memory SQLite — data is lost when container stops (fine for testing)
+
+### Production Deployment on Render
+
+Set `DATABASE_URL` environment variable to your PostgreSQL connection string:
+
+```bash
+docker run --rm -p 8000:8000 \
+  -e DATABASE_URL="postgresql://user:pass@host:5432/db" \
+  football-service
 ```
 
 ---
@@ -114,11 +139,22 @@ uv run pytest ... --cov        # Test with coverage
 
 ### Configuration
 
-Create `.env`:
+Create `.env` (optional):
 
 ```bash
 PLAYER_APP_NAME=Football Player Service
+# Local development (default)
+DATABASE_URL=sqlite:///./football_players.db
+
+# Or for PostgreSQL
+# DATABASE_URL=postgresql://user:pass@localhost:5432/football_players
 ```
+
+**Database Behavior:**
+
+- **Local:** SQLite file at `football_players.db` (auto-created)
+- **Render/Production:** Set `DATABASE_URL` env var to PostgreSQL connection string
+- Code automatically switches between SQLite and PostgreSQL
 
 ---
 
