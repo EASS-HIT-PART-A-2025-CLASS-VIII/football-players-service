@@ -21,8 +21,8 @@ RUN uv sync --no-dev
 
 COPY football_player_service ./football_player_service
 
-# Change ownership to non-root user
-RUN chown -R appuser:appuser /app
+# Create data directory for database persistence
+RUN mkdir -p /app/data && chown -R appuser:appuser /app
 
 USER appuser
 
@@ -32,4 +32,8 @@ EXPOSE 8000
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
 	CMD curl --fail http://localhost:8000/health || exit 1
 
+# Volume for SQLite database persistence (when using Docker Compose)
+VOLUME ["/app/data"]
+
 CMD ["uv", "run", "uvicorn", "football_player_service.app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+
