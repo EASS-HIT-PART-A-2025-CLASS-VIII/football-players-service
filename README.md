@@ -1,6 +1,6 @@
 # ⚽ Football Player Management System
 
-**Live:** https://football-players-service-1.onrender.com
+**Live:** <a href="https://football-players-service-1.onrender.com" target="_blank">https://football-players-service-1.onrender.com</a>
 
 A modern full-stack web application for managing football player data with **FastAPI** backend and **React 19** frontend.
 
