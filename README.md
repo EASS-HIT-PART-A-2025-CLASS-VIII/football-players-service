@@ -11,7 +11,7 @@ A modern full-stack web application for managing football player data with **Fas
 ### Prerequisites
 
 - **Backend:** Python 3.13+ with `uv` package manager
-- **Frontend:** Node.js 18+ with npm
+- **Frontend:** React + Vite
 - **Docker:** (Optional) Docker & Docker Compose for containerized deployment
 
 ### Option 1: Local Development (Recommended)
@@ -60,47 +60,7 @@ See [Docker & Deployment](#-docker--deployment) section for advanced usage.
 
 ---
 
-## 📁 Project Structure
-
-```
-.
-├── README.md                    # Main project overview (this file)
-├── docker-compose.yml           # Local development with both services
-├── backend/
-│   ├── README.md                # Backend-specific setup & API docs
-│   ├── pyproject.toml           # Python dependencies (uv)
-│   ├── requirements.txt          # For Docker deployment
-│   └── football_player_service/
-│       ├── app/                 # FastAPI application
-│       │   ├── main.py          # FastAPI setup, routes, middleware
-│       │   ├── models.py        # SQLModel definitions
-│       │   ├── database.py      # SQLAlchemy setup (SQLite/PostgreSQL)
-│       │   ├── repository.py    # CRUD operations
-│       │   └── dependencies.py  # DI setup
-│       ├── contracts/           # OpenAPI schema
-│       ├── scripts/             # Utilities (e.g., export OpenAPI)
-│       ├── tests/               # pytest tests (21 total)
-│       └── Dockerfile           # Container image
-└── frontend/
-    ├── README.md                # Frontend-specific setup & architecture
-    ├── package.json             # npm dependencies
-    ├── vite.config.ts           # Vite build config
-    ├── .env                     # Local dev API URL
-    ├── .env.production          # Production API URL
-    ├── src/
-    │   ├── main.tsx             # React entry point
-    │   ├── services/api.ts      # Axios HTTP client
-    │   ├── hooks/               # Custom hooks (usePlayers, usePlayersView)
-    │   ├── components/          # React components
-    │   ├── pages/               # Page components
-    │   └── types/               # TypeScript types
-    ├── Dockerfile               # Container image
-    └── public/                  # Static files
-```
-
 ### 📖 Documentation Structure
-
-**Best Practice:** Multi-level READMEs for clarity
 
 - **[README.md](README.md)** (Root) — Project overview, quick start, architecture overview
 - **[backend/README.md](backend/README.md)** — Backend-specific: setup, API docs, testing, deployment
