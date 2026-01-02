@@ -85,3 +85,13 @@ class PlayerResponse(PlayerBase):
     """Response model matching Player but without table config."""
 
     id: int
+
+
+class PaginatedPlayers(SQLModel):
+    """Paginated response for players list."""
+
+    data: list[Player] = Field(description="List of players on current page")
+    total: int = Field(description="Total number of players")
+    page: int = Field(description="Current page number (1-indexed)")
+    limit: int = Field(description="Items per page")
+    pages: int = Field(description="Total number of pages")

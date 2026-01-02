@@ -8,13 +8,17 @@ import {
 } from "../services/api";
 import type { PlayerCreate } from "../types";
 
-export const usePlayers = (editingId?: number) => {
+export const usePlayers = (
+  editingId?: number,
+  page: number = 1,
+  limit: number = 10
+) => {
   const queryClient = useQueryClient();
 
-  // 1. Main List Query
+  // 1. Main List Query with Pagination
   const playersQuery = useQuery({
-    queryKey: ["players"],
-    queryFn: getPlayers,
+    queryKey: ["players", page, limit],
+    queryFn: () => getPlayers(page, limit),
   });
 
   // 2. Single Player Query (Only runs if we have an ID)
@@ -53,7 +57,9 @@ export const usePlayers = (editingId?: number) => {
     deleteMutation.isPending;
 
   return {
-    players: playersQuery.data ?? [],
+    players: playersQuery.data?.data ?? [],
+    total: playersQuery.data?.total ?? 0,
+    pages: playersQuery.data?.pages ?? 1,
     editingPlayer: singlePlayerQuery.data,
     status: {
       isLoading: playersQuery.isLoading,

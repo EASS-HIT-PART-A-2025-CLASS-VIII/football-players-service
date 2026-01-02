@@ -5,8 +5,11 @@ import type { Player, PlayerCreate } from "../types";
 export const usePlayersView = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | undefined>();
+  const [currentPage, setCurrentPage] = useState(1);
+  const PAGE_SIZE = 12;
 
-  const { players, editingPlayer, status, mutations } = usePlayers(editingId);
+  const { players, total, pages, editingPlayer, status, mutations } =
+    usePlayers(editingId, currentPage, PAGE_SIZE);
 
   const handleOpenCreate = () => {
     setEditingId(undefined);
@@ -31,6 +34,8 @@ export const usePlayersView = () => {
         await mutations.create(data);
       }
       handleCloseModal();
+      // Reset to first page after creation/update
+      setCurrentPage(1);
     } catch (error) {
       console.error("Failed to save player", error);
     }
@@ -40,9 +45,17 @@ export const usePlayersView = () => {
     mutations.delete(id);
   };
 
+  const handlePageChange = (newPage: number) => {
+    setCurrentPage(newPage);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
   return {
     state: {
       players,
+      total,
+      pages,
+      currentPage,
       editingPlayer,
       isModalOpen,
       status,
@@ -53,6 +66,7 @@ export const usePlayersView = () => {
       closeModal: handleCloseModal,
       submitForm: handleSubmit,
       deletePlayer: handleDeleteClick,
+      setPage: handlePageChange,
     },
   };
 };

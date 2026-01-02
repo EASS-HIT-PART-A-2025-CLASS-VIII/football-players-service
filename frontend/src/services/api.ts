@@ -3,10 +3,23 @@ import type { Player, PlayerCreate } from "../types";
 
 const PREFIX = "players";
 
+interface PaginatedResponse {
+  data: Player[];
+  total: number;
+  page: number;
+  limit: number;
+  pages: number;
+}
+
 // READ
-export const getPlayers = async (): Promise<Player[]> => {
+export const getPlayers = async (
+  page: number = 1,
+  limit: number = 10
+): Promise<PaginatedResponse> => {
   try {
-    const response = await axiosInstance.get(`/${PREFIX}`);
+    const response = await axiosInstance.get(`/${PREFIX}`, {
+      params: { page, limit },
+    });
     return response.data;
   } catch (error) {
     console.error("Error fetching players:", error);

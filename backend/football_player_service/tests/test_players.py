@@ -68,10 +68,14 @@ def test_player_ids_increment(client):
 
 
 def test_list_players_returns_empty_array_initially(client):
-    """Empty repository returns empty array."""
+    """Empty repository returns empty paginated response."""
     response = client.get("/players")
     assert response.status_code == 200
-    assert response.json() == []
+    data = response.json()
+    assert data["data"] == []
+    assert data["total"] == 0
+    assert data["page"] == 1
+    assert data["pages"] == 0
 
 
 def test_list_players_returns_created_player(client):
@@ -89,9 +93,10 @@ def test_list_players_returns_created_player(client):
 
     response = client.get("/players")
     assert response.status_code == 200
-    players = response.json()
-    assert len(players) == 1
-    assert players[0]["full_name"] == "Erling Haaland"
+    data = response.json()
+    assert data["total"] >= 1
+    assert len(data["data"]) >= 1
+    assert data["data"][0]["full_name"] == "Erling Haaland"
 
 
 def test_get_player_by_id(client):

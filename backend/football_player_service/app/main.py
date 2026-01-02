@@ -1,7 +1,7 @@
 import logging
 from typing import List
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, HTTPException, Request, status
+from fastapi import FastAPI, HTTPException, Request, status, Query
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from slowapi import Limiter
@@ -9,7 +9,7 @@ from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 
 from .dependencies import RepositoryDep, SettingsDep
-from .models import Player, PlayerCreate
+from .models import Player, PlayerCreate, PaginatedPlayers
 from .database import init_db
 
 logger = logging.getLogger("football-player-service")
@@ -112,10 +112,33 @@ def health(settings: SettingsDep) -> dict:
     return {"status": "ok", "app": settings.app_name}
 
 
-@app.get("/players", response_model=List[Player], tags=["players"])
-def list_players(repository: RepositoryDep) -> List[Player]:
-    """Get all players."""
-    return list(repository.list())
+@app.get("/players", response_model=PaginatedPlayers, tags=["players"])
+def list_players(
+    repository: RepositoryDep,
+    page: int = Query(1, ge=1, description="Page number (1-indexed)"),
+    limit: int = Query(12, ge=1, le=100, description="Items per page"),
+) -> PaginatedPlayers:
+    """Get players with pagination."""
+    all_players = list(repository.list())
+    total = len(all_players)
+    pages = (total + limit - 1) // limit  # Ceiling division
+    
+    # Validate page number
+    if page > pages and total > 0:
+        page = pages
+    
+    # Calculate slice boundaries
+    start = (page - 1) * limit
+    end = start + limit
+    paginated_data = all_players[start:end]
+    
+    return PaginatedPlayers(
+        data=paginated_data,
+        total=total,
+        page=page,
+        limit=limit,
+        pages=pages,
+    )
 
 
 @app.post(
