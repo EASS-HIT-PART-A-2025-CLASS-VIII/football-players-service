@@ -246,3 +246,20 @@ def delete_player(
         )
     repository.delete(player_id)
     logger.info("player.deleted id=%s", player_id)
+
+
+# === AI Scout Producer Endpoint ===
+import uuid
+import os
+from celery import Celery
+
+# Celery config
+REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+celery_app = Celery("ai_scout", broker=REDIS_URL, backend=REDIS_URL)
+
+@app.post("/players/{player_id}/scout", status_code=202, tags=["ai-scout"])
+def scout_player(player_id: int):
+    """Enqueue AI scouting report generation for a player."""
+    task_id = str(uuid.uuid4())
+    celery_app.send_task("ai_scout.generate_report", args=[player_id], task_id=task_id)
+    return {"task_id": task_id, "status": "accepted"}

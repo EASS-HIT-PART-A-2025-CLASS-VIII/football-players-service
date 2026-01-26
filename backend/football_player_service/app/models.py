@@ -60,6 +60,12 @@ class PlayerBase(SQLModel):
         description="Player's age in years (0-120)",
     )
 
+    scouting_report: Optional[str] = Field(
+        None,
+        description="AI-generated scouting report (optional)",
+        max_length=5000,
+    )
+
 
 class Player(PlayerBase, table=True):
     """Database model with auto-generated ID."""

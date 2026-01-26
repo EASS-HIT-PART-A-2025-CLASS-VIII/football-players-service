@@ -1,3 +1,20 @@
+## AI Scout Microservice (Exercise 3)
+
+### Backend Changes
+
+- Added `scouting_report` field to Player model.
+- New endpoint: `POST /players/{id}/scout` (enqueues async AI scouting report task).
+- New worker: `backend/scripts/worker.py` (Celery worker for AI Scout logic).
+
+### Database Migration
+
+- If using Alembic, generate and apply a migration to add the `scouting_report` column to the `players` table:
+  ```bash
+  alembic revision --autogenerate -m "add scouting_report to player"
+  alembic upgrade head
+  ```
+- If not using Alembic, delete the database file and restart to auto-create tables (for dev only).
+
 # ⚽ Football Player Service
 
 A production-ready FastAPI CRUD service for managing football player data.
