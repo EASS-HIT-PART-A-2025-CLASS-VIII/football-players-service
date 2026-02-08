@@ -1,0 +1,17 @@
+[project]
+name = "analytics-service"
+version = "1.0.0"
+description = "AI-powered analytics microservice for football players"
+requires-python = ">=3.13"
+dependencies = [
+    "fastapi~=0.123.0",
+    "httpx~=0.28.1",
+    "pydantic~=2.12.5",
+    "uvicorn~=0.38.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest~=8.3.0",
+    "pytest-asyncio~=0.24.0",
+]

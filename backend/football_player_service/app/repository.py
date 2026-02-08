@@ -1,7 +1,7 @@
 # filepath: football_player_service/app/repository.py
 from typing import List, Optional
 from sqlmodel import Session, select, func
-from .models import Player, PlayerCreate
+from .models import Player, PlayerCreate, User, UserRole
 
 
 class PlayerRepository:
@@ -51,3 +51,38 @@ class PlayerRepository:
         if player:
             self.session.delete(player)
             self.session.commit()
+
+
+class UserRepository:
+    """User repository for authentication."""
+    
+    def __init__(self, session: Session) -> None:
+        self.session = session
+    
+    def create(self, email: str, username: str, hashed_password: str, role: UserRole = UserRole.USER) -> User:
+        """Create a new user."""
+        user = User(
+            email=email,
+            username=username,
+            hashed_password=hashed_password,
+            role=role
+        )
+        self.session.add(user)
+        self.session.commit()
+        self.session.refresh(user)
+        return user
+    
+    def get_by_username(self, username: str) -> Optional[User]:
+        """Get user by username."""
+        statement = select(User).where(User.username == username)
+        return self.session.exec(statement).first()
+    
+    def get_by_email(self, email: str) -> Optional[User]:
+        """Get user by email."""
+        statement = select(User).where(User.email == email)
+        return self.session.exec(statement).first()
+    
+    def get(self, user_id: int) -> Optional[User]:
+        """Get user by ID."""
+        return self.session.get(User, user_id)
+

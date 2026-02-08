@@ -1,0 +1,6 @@
+# Worker Service Dependencies
+# Generated from pyproject.toml
+
+redis==5.2.1
+rq==2.1.0
+httpx==0.28.1

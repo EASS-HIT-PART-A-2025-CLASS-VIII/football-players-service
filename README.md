@@ -48,12 +48,31 @@ docker-compose up
 
 - **API Docs:** http://localhost:8000/docs
 - **App:** http://localhost:3000
-- **Database:** SQLite (persists in `backend-data` volume)
+- **Database:** SQLite by default (persists in `backend-data` volume)
 
 **Stop:**
 
 ```bash
 docker-compose down
+```
+
+#### Using Render PostgreSQL Instead
+
+If you want to use your **Render PostgreSQL** database instead of SQLite:
+
+```bash
+# Create .env file in project root
+echo "DATABASE_URL=postgresql+psycopg2://user:password@host.render.com:5432/database" > .env
+
+# Now docker-compose will use PostgreSQL
+docker-compose up
+```
+
+To switch back to SQLite, just delete the `.env` file:
+
+```bash
+rm .env
+docker-compose up  # Back to SQLite
 ```
 
 See [Docker & Deployment](#-docker--deployment) section for advanced usage.
@@ -237,6 +256,40 @@ docker run --rm -p 8000:8000 football-service
 docker run --rm -p 3000:3000 football-frontend
 ```
 
+### Environment Variables for Docker Compose
+
+By default, Docker Compose uses **SQLite** for the database. This works out-of-the-box with no configuration needed.
+
+To use **Render PostgreSQL** instead, create a `.env` file in the project root:
+
+```bash
+# .env (project root)
+DATABASE_URL=postgresql+psycopy://user:password@host.render.com:5432/database
+```
+
+Docker Compose automatically reads this file and switches to PostgreSQL.
+
+#### Switching Databases
+
+```bash
+# Default: SQLite (no .env file needed)
+docker-compose up
+
+# PostgreSQL: Create .env with DATABASE_URL
+echo "DATABASE_URL=postgresql+psycopy://..." > .env
+docker-compose up
+
+# Back to SQLite: Delete .env
+rm .env
+docker-compose up
+```
+
+#### Note
+
+- The `.env` file is in `.gitignore` to keep credentials safe
+- The database URL is optional – SQLite is the fallback
+- Changes to `.env` require restarting containers
+
 ### Customizing Docker Compose
 
 Edit [docker-compose.yml](docker-compose.yml) to:
@@ -248,31 +301,15 @@ ports:
   - "9000:8000" # Backend on 9000 instead of 8000
 ```
 
-**Use PostgreSQL instead of SQLite (production-like):**
+**Change frontend API location:**
 
 ```yaml
-backend:
+frontend:
   environment:
-    - DATABASE_URL=postgresql://user:pass@db:5432/football
+    - VITE_API_LOCATION=http://localhost:9000
 ```
 
-**Add database service:**
-
-```yaml
-services:
-  db:
-    image: postgres:16
-    environment:
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: football
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
-
-volumes:
-  postgres-data:
-```
-
-See [backend/README.md](backend/README.md) for database configuration details.
+See [backend/README.md](backend/README.md) for additional configuration details.
 
 ---
 

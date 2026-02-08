@@ -1,8 +1,9 @@
 # filepath: football_player_service/app/models.py
 from enum import Enum
 from typing import Optional
+from datetime import datetime
 from sqlmodel import SQLModel, Field
-from pydantic import field_validator
+from pydantic import field_validator, EmailStr
 
 # Validation constants
 MIN_FULL_NAME_LENGTH = 2
@@ -95,3 +96,25 @@ class PaginatedPlayers(SQLModel):
     page: int = Field(description="Current page number (1-indexed)")
     limit: int = Field(description="Items per page")
     pages: int = Field(description="Total number of pages")
+
+
+# Auth-related models
+class UserRole(str, Enum):
+    """User roles for access control."""
+    ADMIN = "admin"
+    USER = "user"
+
+
+class User(SQLModel, table=True):
+    """User database model."""
+    
+    __tablename__ = "users"
+    
+    id: Optional[int] = Field(default=None, primary_key=True)
+    email: str = Field(unique=True, index=True)
+    username: str = Field(unique=True, index=True)
+    hashed_password: str
+    role: UserRole = Field(default=UserRole.USER)
+    is_active: bool = Field(default=True)
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+

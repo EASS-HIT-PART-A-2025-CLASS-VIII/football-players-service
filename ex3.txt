@@ -1,0 +1,19 @@
+so lets plan to implement it via THIS current repo (project)
+no need folder "ex3" this is  just the name of the task. we do that on the same repo 
+we need the free version of ai analytics 
+
+EX3 – Full-Stack Microservices Final Project (KISS)
+Assigned: Monday, Jan 5, 2026
+Due: Tuesday, Feb 10, 2026 at 23:59 (Israel time)
+Goal: Finish a tidy local product by joining the EX1 backend, the dedicated persistence layer from Session 04, and the EX2 interface, then adding integrations with at least one additional microservice (LLM tool, reporting worker, notification service, etc.) plus documentation you wish every teammate handed you. Everything must run locally via uv run/python -m for scripts and docker compose up for the API + Redis + worker stack—no cloud hosting required, but Compose, telemetry, and security guardrails from Sessions 09–12 are now graded expectations.
+Sessions to revisit: Session 07 – Testing and Diagnostics, Session 08 – AI Pairing Tips, Session 09 – Async Recommendation Refresh, Session 10 – Docker Compose, Redis, and Service Contracts, Session 11 – Security Foundations, Session 12 – Tool-Friendly APIs and Final Prep. These later sessions deepen reliability, orchestration, security, and release polish—lean on the ones that strengthen your EX3 storyline.
+Required Pieces:
+One Git repository containing at least three cooperating services: the FastAPI backend, a persistence layer (SQLite/SQLModel or equivalent), and a user-facing interface (Streamlit or Typer). Most strong submissions will add a fourth microservice (LLM tool via Pydantic AI, background worker, webhook listener, etc.). Document orchestration in docs/EX3-notes.md.
+A compose.yaml plus docs/runbooks/compose.md instructions covering how to launch the API, Redis, and async worker, how to verify health/rate-limit headers, and how to run Schemathesis/pytest in CI.
+Session 09’s async refresher deliverable: scripts/refresh.py with bounded concurrency, retries, and Redis-backed idempotency plus at least one pytest.mark.anyio test. Paste a Logfire or Redis trace excerpt into docs/EX3-notes.md.
+Session 11’s security baseline: hashed credentials, at least one JWT-protected route with role checks, rotation steps captured in docs/EX3-notes.md, and tests that fail when a token is expired or missing scope.
+One enhancement that makes the product nicer without increasing complexity—examples: searchable catalog filtering, weekly recommendation digest generated via a simple SQL query, a CSV import/export command, or a PDF/Markdown summary report.
+Automated tests that cover the enhancement (unit tests, simple integration test, or Typer CLI exercise).
+Local demo script: uv run python -m app.demo or scripts/demo.sh that walks graders through starting the API, launching the interface, and using the new feature.
+Rubric (100 pts): working integration 35, thoughtful enhancement 25, automation/tests 20, documentation/demo assets 20. Bonus (+5) for recording a ≤2 min screen capture showing the flow end-to-end (attach a local .mp4 or shareable link).
+🧭 Scope guardrail: If a feature smells like production security, massive data ingestion, or multi-service orchestration, it’s beyond scope. Keep it local, deterministic, and doable in a weekend.

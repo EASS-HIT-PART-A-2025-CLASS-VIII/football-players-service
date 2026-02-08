@@ -16,8 +16,8 @@ services:
       - backend-data:/app/data
     environment:
       - PYTHONUNBUFFERED=1
-      # SQLite database file (in /app/data volume)
-      - DATABASE_URL=sqlite:////app/data/football_players.db
+      # Database URL from .env file (PostgreSQL or SQLite)
+      - DATABASE_URL=${DATABASE_URL:-sqlite:////app/data/football_players.db}
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s

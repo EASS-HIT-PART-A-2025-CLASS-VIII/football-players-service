@@ -1,0 +1,11 @@
+# Analytics Service Dependencies
+# Generated from pyproject.toml
+
+fastapi==0.123.0
+httpx==0.28.1
+pydantic==2.12.5
+uvicorn==0.38.0
+
+# Optional: for real LLM integration (future)
+# pydantic-ai==0.0.13
+# groq==0.9.0
