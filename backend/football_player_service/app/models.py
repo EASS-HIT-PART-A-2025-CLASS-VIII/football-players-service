@@ -101,3 +101,16 @@ class PaginatedPlayers(SQLModel):
     page: int = Field(description="Current page number (1-indexed)")
     limit: int = Field(description="Items per page")
     pages: int = Field(description="Total number of pages")
+
+class User(SQLModel, table=True):
+    username: str = Field(primary_key=True)
+    hashed_password: str
+    role: str = Field(default="user") # user, admin
+
+class Token(SQLModel):
+    access_token: str
+    token_type: str
+
+class TokenData(SQLModel):
+    username: Optional[str] = None
+    role: Optional[str] = None

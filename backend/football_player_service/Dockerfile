@@ -20,6 +20,8 @@ COPY pyproject.toml ./
 RUN uv sync --no-dev
 
 COPY football_player_service ./football_player_service
+COPY scripts ./scripts
+
 
 # Create data directory for database persistence
 RUN mkdir -p /app/data && chown -R appuser:appuser /app
