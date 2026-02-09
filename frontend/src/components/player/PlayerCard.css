@@ -49,7 +49,9 @@
 .player-card:hover {
   border-color: rgba(0, 255, 136, 0.3);
   transform: translateY(-8px);
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), 0 0 30px rgba(0, 255, 136, 0.1);
+  box-shadow:
+    0 20px 40px rgba(0, 0, 0, 0.4),
+    0 0 30px rgba(0, 255, 136, 0.1);
 }
 
 .card-glow {
@@ -268,6 +270,18 @@
   background: rgba(0, 212, 255, 0.2);
   transform: scale(1.1);
   box-shadow: 0 0 15px rgba(0, 212, 255, 0.4);
+}
+
+.scout-btn {
+  background: rgba(138, 43, 226, 0.1);
+  color: #9b59b6;
+  border: 1px solid rgba(138, 43, 226, 0.3);
+}
+
+.scout-btn:hover:not(:disabled) {
+  background: rgba(138, 43, 226, 0.2);
+  transform: scale(1.1);
+  box-shadow: 0 0 15px rgba(138, 43, 226, 0.4);
 }
 
 .delete-btn {

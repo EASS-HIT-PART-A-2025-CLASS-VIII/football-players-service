@@ -14,6 +14,15 @@ dependencies = [
     "sqlmodel~=0.0.18",
     "alembic~=1.14.0",
     "psycopg2-binary~=2.9.9",
+    "celery",
+    "redis",
+    "requests",
+    "passlib[bcrypt]",
+    "bcrypt==3.2.2",
+    "python-jose[cryptography]",
+    "python-multipart",
+    "anyio",
+    "tenacity>=8.0.0",
 ]
 
 [dependency-groups]

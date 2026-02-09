@@ -1,10 +1,22 @@
 import { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faFutbol, faBars, faXmark } from "@fortawesome/free-solid-svg-icons";
+import {
+  faFutbol,
+  faBars,
+  faXmark,
+  faRightFromBracket,
+  faRightToBracket,
+} from "@fortawesome/free-solid-svg-icons";
 import "./Navbar.css";
 
-const Navbar = () => {
+interface NavbarProps {
+  isAuthenticated: boolean;
+  onLogout: () => void;
+  onOpenLogin: () => void;
+}
+
+const Navbar = ({ isAuthenticated, onLogout, onOpenLogin }: NavbarProps) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const location = useLocation();
 
@@ -39,15 +51,38 @@ const Navbar = () => {
                 Home
               </Link>
             </li>
+            {isAuthenticated && (
+              <li className="navbar-item">
+                <Link
+                  to="/players"
+                  className={`navbar-link ${
+                    isActive("/players") ? "active" : ""
+                  }`}
+                >
+                  Players
+                </Link>
+              </li>
+            )}
             <li className="navbar-item">
-              <Link
-                to="/players"
-                className={`navbar-link ${
-                  isActive("/players") ? "active" : ""
-                }`}
-              >
-                Players
-              </Link>
+              {isAuthenticated ? (
+                <button
+                  onClick={onLogout}
+                  className="navbar-link logout-button"
+                  title="Logout"
+                >
+                  <FontAwesomeIcon icon={faRightFromBracket} />
+                  <span className="logout-text">Logout</span>
+                </button>
+              ) : (
+                <button
+                  onClick={onOpenLogin}
+                  className="navbar-link signin-button"
+                  title="Sign In"
+                >
+                  <FontAwesomeIcon icon={faRightToBracket} />
+                  <span className="signin-text">Sign In</span>
+                </button>
+              )}
             </li>
           </ul>
 
@@ -81,16 +116,41 @@ const Navbar = () => {
                 Home
               </Link>
             </li>
+            {isAuthenticated && (
+              <li className="mobile-menu-item">
+                <Link
+                  to="/players"
+                  className={`mobile-menu-link ${
+                    isActive("/players") ? "active" : ""
+                  }`}
+                  onClick={closeMobileMenu}
+                >
+                  Players
+                </Link>
+              </li>
+            )}
             <li className="mobile-menu-item">
-              <Link
-                to="/players"
-                className={`mobile-menu-link ${
-                  isActive("/players") ? "active" : ""
-                }`}
-                onClick={closeMobileMenu}
-              >
-                Players
-              </Link>
+              {isAuthenticated ? (
+                <button
+                  onClick={() => {
+                    onLogout();
+                    closeMobileMenu();
+                  }}
+                  className="mobile-menu-link logout-button"
+                >
+                  <FontAwesomeIcon icon={faRightFromBracket} /> Logout
+                </button>
+              ) : (
+                <button
+                  onClick={() => {
+                    onOpenLogin();
+                    closeMobileMenu();
+                  }}
+                  className="mobile-menu-link signin-button"
+                >
+                  <FontAwesomeIcon icon={faRightToBracket} /> Sign In
+                </button>
+              )}
             </li>
           </ul>
         </div>

@@ -41,6 +41,11 @@ const PlayerBaseSchema = z.object({
     .max(10_000_000_000, "Market value cannot exceed 10 billion USD")
     .nullable()
     .optional(),
+  scouting_report: z
+    .string()
+    .max(5000, "Scouting report cannot exceed 5000 characters")
+    .nullable()
+    .optional(),
 });
 
 /**
@@ -62,3 +67,43 @@ export const PlayerCreateSchema = PlayerBaseSchema;
 export type Player = z.infer<typeof PlayerSchema>;
 export type PlayerCreate = z.infer<typeof PlayerCreateSchema>;
 export type PlayingStatus = z.infer<typeof PlayingStatusSchema>;
+
+/**
+ * Task status types for async operations (e.g., AI scouting)
+ */
+export interface TaskStatus {
+  task_id: string;
+  status: "pending" | "running" | "completed" | "failed";
+  result?: string | null;
+  error?: string | null;
+  created_at?: string | null;
+}
+
+export interface ScoutResponse {
+  task_id: string;
+  status: string;
+}
+
+/**
+ * Filter types for player search and filtering
+ */
+export interface PlayerFilters {
+  name?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  country?: string;
+  club?: string;
+  league?: string;
+  status?: PlayingStatus;
+}
+
+/**
+ * Filter options returned from backend
+ * Contains distinct values for all filter dropdowns
+ */
+export interface FilterOptions {
+  countries: string[];
+  clubs: string[];
+  leagues: string[];
+  statuses: string[];
+}

@@ -1,0 +1,219 @@
+.player-filters {
+  margin-bottom: var(--spacing-md);
+  background: rgba(26, 31, 53, 0.9);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 255, 136, 0.1);
+  border-radius: 16px;
+  padding: var(--spacing-md);
+  box-shadow: var(--shadow-elevated);
+  height: 120px;
+  display: flex;
+  align-items: center;
+}
+
+.filters-container {
+  display: flex;
+  gap: var(--spacing-sm);
+  align-items: flex-end;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 140px;
+  flex: 1;
+  position: relative;
+}
+
+.filter-group label {
+  font-weight: 500;
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.filter-group input,
+.filter-group select {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 8px;
+  font-size: 0.875rem;
+  background: rgba(17, 24, 39, 0.8);
+  color: var(--color-text-primary);
+  transition: all 0.2s ease;
+  font-family: var(--font-body);
+  height: 40px;
+}
+
+.filter-group input:focus,
+.filter-group select:focus {
+  outline: none;
+  border-color: var(--color-accent-neon);
+  box-shadow: 0 0 0 2px rgba(0, 255, 136, 0.1);
+  background: rgba(17, 24, 39, 1);
+}
+
+.filter-group input:disabled,
+.filter-group select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.search-group {
+  flex: 2;
+  min-width: 200px;
+}
+
+.search-input {
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.price-group {
+  flex: 0 0 120px;
+  min-width: 100px;
+}
+
+/* Individual clear button styling */
+.filter-clear-btn {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  padding: 2px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+  z-index: 1;
+}
+
+.filter-clear-btn:hover {
+  background: rgba(255, 51, 102, 0.1);
+  color: var(--color-accent-warning);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.filter-clear-btn:active {
+  transform: translateY(-50%) scale(0.95);
+}
+
+/* Adjust input padding when clear button is present */
+.filter-group.has-value input,
+.filter-group.has-value select {
+  padding-right: 30px;
+}
+
+.filter-actions {
+  display: flex;
+  align-items: flex-end;
+  flex-shrink: 0;
+}
+
+.clear-button {
+  padding: 0.5rem 1rem;
+  background: rgba(255, 51, 102, 0.1);
+  color: var(--color-accent-warning);
+  border: 1px solid rgba(255, 51, 102, 0.2);
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: 40px;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+}
+
+.clear-button:hover:not(:disabled) {
+  background: rgba(255, 51, 102, 0.15);
+  border-color: var(--color-accent-warning);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 51, 102, 0.2);
+}
+
+.clear-button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.filter-badge {
+  background: var(--color-accent-warning);
+  color: var(--color-bg-primary);
+  border-radius: 12px;
+  padding: 0.125rem 0.375rem;
+  font-size: 0.625rem;
+  font-weight: 600;
+  min-width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .filters-container {
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .filter-group {
+    min-width: 120px;
+  }
+
+  .search-group {
+    flex: 1 1 200px;
+    order: -1;
+    width: 100%;
+  }
+
+  .price-group {
+    flex: 1 1 100px;
+  }
+
+  .player-filters {
+    height: auto;
+    min-height: 180px;
+    padding: var(--spacing-sm);
+  }
+}
+
+@media (max-width: 768px) {
+  .filters-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filter-group {
+    min-width: unset;
+    flex: none;
+  }
+
+  .search-group {
+    order: 0;
+  }
+
+  .player-filters {
+    height: auto;
+    min-height: 200px;
+  }
+}

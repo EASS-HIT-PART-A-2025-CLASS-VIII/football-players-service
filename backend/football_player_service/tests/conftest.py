@@ -24,7 +24,7 @@ def test_engine():
         cursor.close()
 
     # Import models to register them with metadata
-    from football_player_service.app.models import Player  # noqa: F401
+    from football_player_service.app.models import Player, User  # noqa: F401
 
     # Create all tables
     SQLModel.metadata.create_all(engine)
@@ -74,10 +74,9 @@ def client(test_engine):
     database.init_db = override_init_db
     app.dependency_overrides[database.get_session] = override_get_session
 
-    # Create test client (this will trigger lifespan which now uses overridden init_db)
-    test_client = TestClient(app)
-
-    yield test_client
+    # Create test client and ensure lifespan events run
+    with TestClient(app) as test_client:
+        yield test_client
 
     # Cleanup
     database.init_db = original_init_db

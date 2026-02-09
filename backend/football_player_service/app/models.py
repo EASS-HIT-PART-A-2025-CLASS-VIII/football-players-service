@@ -60,6 +60,12 @@ class PlayerBase(SQLModel):
         description="Player's age in years (0-120)",
     )
 
+    scouting_report: Optional[str] = Field(
+        None,
+        description="AI-generated scouting report (optional)",
+        max_length=5000,
+    )
+
 
 class Player(PlayerBase, table=True):
     """Database model with auto-generated ID."""
@@ -95,3 +101,24 @@ class PaginatedPlayers(SQLModel):
     page: int = Field(description="Current page number (1-indexed)")
     limit: int = Field(description="Items per page")
     pages: int = Field(description="Total number of pages")
+
+class User(SQLModel, table=True):
+    username: str = Field(primary_key=True)
+    hashed_password: str
+    role: str = Field(default="user") # user, admin
+
+class Token(SQLModel):
+    access_token: str
+    token_type: str
+
+class TokenData(SQLModel):
+    username: Optional[str] = None
+    role: Optional[str] = None
+
+class TaskStatus(SQLModel):
+    """Response model for async task status."""
+    task_id: str
+    status: str  # pending, running, completed, failed
+    result: Optional[str] = None
+    error: Optional[str] = None
+    created_at: Optional[str] = None
