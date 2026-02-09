@@ -18,11 +18,11 @@ dependencies = [
     "redis",
     "requests",
     "passlib[bcrypt]",
-    "pyjwt",
+    "bcrypt==3.2.2",
+    "python-jose[cryptography]",
+    "python-multipart",
     "anyio",
-
-
-
+    "tenacity>=8.0.0",
 ]
 
 [dependency-groups]

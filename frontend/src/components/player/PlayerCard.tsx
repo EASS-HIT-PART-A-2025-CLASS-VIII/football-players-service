@@ -5,6 +5,7 @@ import {
   faCakeCandles,
   faPencil,
   faTrash,
+  faSearch,
 } from "@fortawesome/free-solid-svg-icons";
 import { formatCurrency, getStatusColor } from "../../utils";
 import type { Player } from "../../types";
@@ -16,6 +17,7 @@ interface PlayerCardProps {
   index: number;
   onEdit: (player: Player) => void;
   onDelete: (id: number) => void;
+  onScout: () => void;
   isLoading: boolean;
 }
 
@@ -24,6 +26,7 @@ const PlayerCard = ({
   index,
   onEdit,
   onDelete,
+  onScout,
   isLoading,
 }: PlayerCardProps) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -79,6 +82,19 @@ const PlayerCard = ({
       </div>
 
       <div className="card-actions">
+        <button
+          className="card-action-btn scout-btn"
+          onClick={onScout}
+          disabled={isLoading}
+          aria-label="Scout player"
+          title={
+            player.scouting_report
+              ? "View scout report"
+              : "Generate scout report"
+          }
+        >
+          <FontAwesomeIcon icon={faSearch} />
+        </button>
         <button
           className="card-action-btn edit-btn"
           onClick={() => onEdit(player)}

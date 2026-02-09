@@ -84,6 +84,7 @@
 
 .navbar-menu {
   display: flex;
+  align-items: center;
   list-style: none;
   gap: var(--spacing-xs);
   margin: 0;
@@ -95,7 +96,9 @@
 }
 
 .navbar-link {
-  display: block;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
   color: var(--color-text-secondary);
   text-decoration: none;
   font-family: var(--font-body);
@@ -104,6 +107,7 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
   padding: 0.75rem 1.5rem;
+  border: 1px solid transparent;
   border-radius: 8px;
   position: relative;
   overflow: hidden;
@@ -142,6 +146,47 @@
   background: rgba(0, 255, 136, 0.1);
   border: 1px solid rgba(0, 255, 136, 0.3);
   box-shadow: var(--shadow-glow-neon);
+}
+
+/* Logout Button */
+.logout-button {
+  background: none;
+  cursor: pointer;
+}
+
+.logout-text {
+  display: inline;
+}
+
+.logout-button:hover {
+  color: var(--color-accent-warning);
+  background: rgba(255, 51, 102, 0.1);
+  border-color: rgba(255, 51, 102, 0.3);
+}
+
+/* Sign In Button */
+.signin-button {
+  background: none;
+  cursor: pointer;
+}
+
+.signin-text {
+  display: inline;
+}
+
+.signin-button:hover {
+  color: var(--color-accent-electric);
+  background: rgba(0, 212, 255, 0.1);
+  border-color: rgba(0, 212, 255, 0.3);
+}
+
+@media (max-width: 768px) {
+  .logout-text {
+    display: inline; /* Show text on mobile for clarity */
+  }
+  .signin-text {
+    display: inline; /* Show text on mobile for clarity */
+  }
 }
 
 /* Hamburger Button */

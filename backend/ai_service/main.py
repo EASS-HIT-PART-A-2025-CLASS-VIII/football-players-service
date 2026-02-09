@@ -1,7 +1,11 @@
 from fastapi import FastAPI, HTTPException, Body
 from pydantic import BaseModel
 import os
-import google.generativeai as genai
+
+try:
+    import google.generativeai as genai
+except ImportError:
+    genai = None
 
 app = FastAPI(title="AI Scout Service")
 
@@ -17,15 +21,13 @@ class ScoutResponse(BaseModel):
 @app.post("/generate", response_model=ScoutResponse)
 def generate_report(request: ScoutRequest):
     api_key = os.getenv("GEMINI_API_KEY")
-    if not api_key:
+    if not api_key or api_key == "your_gemini_api_key_here" or genai is None:
         # Fallback for demo/testing without key
-        return {"report": "Simulated Report: This player shows great promise. (No API Key provided)"}
-        # Alternatively raise error:
-        # raise HTTPException(status_code=500, detail="GEMINI_API_KEY not set")
+        return {"report": f"⚠️ Simulated Report for {request.player_name}: This player shows great promise and excellent technical skills for their age ({request.age}). Based on their position ({request.position}), they demonstrate strong fundamentals. (No valid GEMINI_API_KEY provided - using fallback mode)"}
 
     try:
         genai.configure(api_key=api_key)
-        model = genai.GenerativeModel('gemini-1.5-flash')
+        model = genai.GenerativeModel('gemini-2.0-flash')
         
         prompt = (
             f"Write a short, professional football scouting report for a player named {request.player_name}. "
@@ -37,7 +39,9 @@ def generate_report(request: ScoutRequest):
         response = model.generate_content(prompt)
         return {"report": response.text}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        # Log the error and return fallback instead of crashing
+        print(f"ERROR: Gemini API failed: {str(e)}")
+        return {"report": f"⚠️ Fallback Report for {request.player_name}: Excellent player with strong fundamentals. Position: {request.position}, Age: {request.age}. Shows promise for development. (API Error: {str(e)[:100]})"}
 
 @app.get("/health")
 def health():

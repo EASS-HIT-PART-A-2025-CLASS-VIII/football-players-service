@@ -1,25 +1,8 @@
-## AI Scout Microservice (Exercise 3)
+# Football Player Service (Backend API)
 
-### Backend Changes
+A FastAPI backend for managing football player data with validation, JWT auth, rate limiting, and async AI scouting.
 
-- Added `scouting_report` field to Player model.
-- New endpoint: `POST /players/{id}/scout` (enqueues async AI scouting report task).
-- New worker: `backend/scripts/worker.py` (Celery worker for AI Scout logic).
-
-### Database Migration
-
-- If using Alembic, generate and apply a migration to add the `scouting_report` column to the `players` table:
-  ```bash
-  alembic revision --autogenerate -m "add scouting_report to player"
-  alembic upgrade head
-  ```
-- If not using Alembic, delete the database file and restart to auto-create tables (for dev only).
-
-# ⚽ Football Player Service
-
-A production-ready FastAPI CRUD service for managing football player data.
-
-## 🚀 Quick Start
+## Quick Start (Backend Only)
 
 ```bash
 cd backend
@@ -31,40 +14,121 @@ uv sync --no-dev
 uv run python -m uvicorn football_player_service.app.main:app --reload --port 8000
 ```
 
-**API Docs:** `http://localhost:8000/docs` (Swagger UI)
+API docs: http://localhost:8000/docs
 
----
+## AI Scout (Async)
 
-## 🔧 Tech Stack
+The scout feature uses Redis + Celery and calls the AI service. If you only run the backend process, the scout endpoints will not complete without the worker and AI service.
 
-- **FastAPI** (Python 3.13+)
-- **SQLModel** — Database ORM
-- **SQLite** (local) / **PostgreSQL** (production) — Flexible database backend
-- **Pydantic v2** — Validation
-- **pytest** — 21 comprehensive tests
-- **Docker** — Containerization
-- **Rate Limiting** — 100 req/min per IP
-- **Security Headers** — CORS, HSTS, Content-Type protection
+For the full stack (backend, frontend, worker, Redis, AI service), see docs/runbooks/compose.md.
 
----
+## Overview
 
-## 📚 API Endpoints
+Football Player Service with AI-powered scouting reports - a complete microservices demonstration showcasing async job processing, task tracking, and service-to-service communication.
+
+## Microservices Architecture
+
+The solution consists of **5 cooperating services** managed via Docker Compose:
+
+### 1. Backend (FastAPI) - Main API Gateway
+
+- **Port:** 8000
+- **Role:** Core REST API for player CRUD operations and task orchestration
+- **Tech:** FastAPI, SQLModel, SQLite, Redis, Celery
+- **Key Endpoints:**
+  - `GET/POST /players` - Player management
+  - `POST /players/{id}/scout` - Enqueue AI scouting task (returns task_id)
+  - `GET /tasks/{task_id}` - Check async task status (NEW)
+  - `GET /health` - Health check
+  - `POST /token` - JWT authentication (preserved for future use)
+
+### 2. Frontend (React + TypeScript)
+
+- **Port:** 3000
+- **Role:** User interface for managing players and viewing scout reports
+- **Tech:** React, TypeScript, TanStack Query, Axios
+- **Features:**
+  - Player CRUD with pagination
+  - Scout button with real-time progress tracking
+  - Modal UI for viewing reports
+  - Automatic refresh after report generation
+
+### 3. Worker (Celery)
+
+- **Role:** Background task processor for AI scouting
+- **Tech:** Celery, Redis, SQLModel
+- **Behavior:**
+  - Picks tasks from Redis queue
+  - Fetches player data from database
+  - Calls AI Service via HTTP
+  - Updates player record with report
+  - Stores task status in Redis for tracking
+
+### 4. AI Service (FastAPI)
+
+- **Port:** 8001 (internal: 8000)
+- **Role:** Dedicated microservice wrapping Google Gemini API
+- **Tech:** FastAPI, google-generativeai Python library
+- **Endpoints:**
+  - `POST /generate` - Generate scouting report
+  - `GET /health` - Health check
+- **Fallback:** Returns simulated report if GEMINI_API_KEY not set
+
+### 5. Redis
+
+- **Port:** 6379
+- **Role:** Message broker for Celery + task status cache
+- **Uses:**
+  - Celery broker (task queue)
+  - Celery backend (task results)
+  - Custom task status tracking (1-hour TTL)
+
+```
+┌─────────────┐
+│   Frontend  │ (React - Port 3000)
+└──────┬──────┘
+       │ HTTP
+       ▼
+┌─────────────┐     Celery Task      ┌─────────────┐
+│   Backend   │◄────────────────────►│    Redis    │
+│  (FastAPI)  │                      │             │
+└──────┬──────┘                      └──────┬──────┘
+       │                                     │
+       │                                     │ Poll Tasks
+       │                                     ▼
+       │                              ┌─────────────┐     HTTP      ┌─────────────┐
+       │                              │   Worker    │──────────────►│ AI Service  │
+       │                              │  (Celery)   │               │  (Gemini)   │
+       │                              └──────┬──────┘               └─────────────┘
+       │                                     │
+       │                                     │
+       ▼                                     ▼
+┌─────────────────────────────────────────────┐
+│           SQLite Database                   │
+│        (Shared via Docker Volume)           │
+└─────────────────────────────────────────────┘
+```
+
+## API Endpoints
 
 ```
 GET    /health              # Health check
 GET    /players             # List all
-POST   /players             # Create
+POST   /players             # Create (auth)
 GET    /players/{id}        # Get one
-PUT    /players/{id}        # Update
-DELETE /players/{id}        # Delete
+PUT    /players/{id}        # Update (auth)
+DELETE /players/{id}        # Delete (auth)
+POST   /players/{id}/scout  # Enqueue AI scout (auth)
+GET    /tasks/{task_id}     # Task status
 ```
 
-**Example:**
+Example:
 
 ```bash
-# Create
+# Create (auth required)
 curl -X POST http://localhost:8000/players \
   -H "Content-Type: application/json" \
+  -H "Authorization: Bearer <TOKEN>" \
   -d '{
     "full_name": "Lionel Messi",
     "country": "Argentina",
@@ -77,14 +141,24 @@ curl -X POST http://localhost:8000/players \
 
 # Get
 curl http://localhost:8000/players/1
-
-# Delete
-curl -X DELETE http://localhost:8000/players/1
 ```
 
----
+## Authentication
 
-## ✅ Testing
+- Login: `POST /token` (form data: `username`, `password`)
+- Default admin credentials: `admin` / `admin123`
+- Protected endpoints: Create, Update, Delete, Scout
+- Public endpoints: Health, List players, Get player, Task status
+
+## Tech Stack
+
+- FastAPI (Python 3.13+)
+- SQLModel
+- SQLite (local) or PostgreSQL (production)
+- Pydantic v2
+- Redis + Celery (async tasks)
+
+## Testing
 
 ```bash
 # Install dev deps
@@ -97,20 +171,7 @@ uv run pytest football_player_service/tests -v
 uv run pytest football_player_service/tests --cov=football_player_service --cov-report=term-missing
 ```
 
-**Coverage:** 21 tests — Happy path, validation, error handling, security
-
-### Test Architecture
-
-- **In-memory SQLite** — Tests use `cache=shared` in-memory database for speed & isolation
-- **Fixtures** (`conftest.py`) — Session-scoped test database, auto-cleanup between tests
-- **Full integration** — Tests cover HTTP → FastAPI → Repository → SQLite → Response
-- **No mocks** — Real database operations ensure behavior correctness
-
----
-
-## 🐳 Docker
-
-### Local Development (In-Memory SQLite)
+## Docker (Backend Only)
 
 ```bash
 # Build
@@ -120,41 +181,7 @@ docker build -t football-service -f backend/football_player_service/Dockerfile b
 docker run --rm -p 8000:8000 football-service
 ```
 
-Visit http://localhost:8000/docs
-
-**Note:** Uses in-memory SQLite — data is lost when container stops (fine for testing)
-
-### Production Deployment on Render
-
-Set `DATABASE_URL` environment variable to your PostgreSQL connection string:
-
-```bash
-docker run --rm -p 8000:8000 \
-  -e DATABASE_URL="postgresql://user:pass@host:5432/db" \
-  football-service
-```
-
----
-
-## 🛠 Development
-
-### Setup
-
-```bash
-uv sync          # Install dev deps
-pre-commit install    # Enable git hooks
-```
-
-### Commands
-
-```bash
-uv run ruff format .           # Format
-uv run ruff check .            # Lint
-uv run pytest ... -v           # Test
-uv run pytest ... --cov        # Test with coverage
-```
-
-### Configuration
+## Configuration
 
 Create `.env` (optional):
 
@@ -167,40 +194,33 @@ DATABASE_URL=sqlite:///./football_players.db
 # DATABASE_URL=postgresql://user:pass@localhost:5432/football_players
 ```
 
-**Database Behavior:**
+Database behavior:
 
-- **Local:** SQLite file at `football_players.db` (auto-created)
-- **Render/Production:** Set `DATABASE_URL` env var to PostgreSQL connection string
-- Code automatically switches between SQLite and PostgreSQL
+- Local: SQLite file at `football_players.db` (auto-created)
+- Production: set `DATABASE_URL` to a PostgreSQL connection string
 
----
+## Validation Rules
 
-## 📋 Validation Rules
+| Field        | Type | Constraints             |
+| ------------ | ---- | ----------------------- |
+| full_name    | str  | Required, 2-100 chars   |
+| country      | str  | Required, 50 chars max  |
+| status       | str  | active or inactive      |
+| current_team | str  | Required, 100 chars max |
+| league       | str  | Required, 50 chars max  |
+| age          | int  | Required, 0-120         |
+| market_value | int  | Optional, 10B USD max   |
 
-| Field          | Type  | Constraints            |
-| -------------- | ----- | ---------------------- |
-| `full_name`    | `str` | Required, 2-100 chars  |
-| `country`      | `str` | Required, ≤50 chars    |
-| `status`       | `str` | "active" or "inactive" |
-| `current_team` | `str` | Required, ≤100 chars   |
-| `league`       | `str` | Required, ≤50 chars    |
-| `age`          | `int` | Required, 0-120        |
-| `market_value` | `int` | Optional, ≤10B USD     |
+## Error Responses
 
----
+| Status | Code             | Meaning             |
+| ------ | ---------------- | ------------------- |
+| 422    | VALIDATION_ERROR | Invalid input       |
+| 404    | PLAYER_NOT_FOUND | Player not found    |
+| 429    | RATE_LIMIT       | Rate limit exceeded |
+| 500    | INTERNAL_ERROR   | Server error        |
 
-## ❌ Error Responses
-
-| Status | Code               | Meaning             |
-| ------ | ------------------ | ------------------- |
-| `422`  | `VALIDATION_ERROR` | Invalid input       |
-| `404`  | `PLAYER_NOT_FOUND` | Player not found    |
-| `429`  | `RATE_LIMIT`       | Rate limit exceeded |
-| `500`  | `INTERNAL_ERROR`   | Server error        |
-
----
-
-## 📦 What is `uv`?
+## What is uv?
 
 `uv` is a fast Python package manager (replaces pip + venv):
 
@@ -209,10 +229,19 @@ uv sync       # Create .venv + install deps
 uv run CMD    # Run command (auto-activates venv)
 ```
 
-No manual `activate` needed!
+## AI Assistance
 
----
+Prompts and focus areas:
 
-## 📄 License
+- Review the worker + AI service integration points and the async scout flow
+- Validate JWT auth and task tracking behavior in the backend
+- Confirm test coverage for core CRUD and refresh logic
+
+Verification:
+
+- Manual API checks for login, create/update/delete, and scout
+- Pytest runs for `football_player_service/tests` and `tests/test_refresh.py`
+
+## License
 
 MIT

@@ -22,6 +22,8 @@ RUN uv sync --no-dev
 COPY football_player_service ./football_player_service
 COPY scripts ./scripts
 
+# Make entrypoint script executable
+RUN chmod +x scripts/entrypoint.sh
 
 # Create data directory for database persistence
 RUN mkdir -p /app/data && chown -R appuser:appuser /app
@@ -37,5 +39,7 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
 # Volume for SQLite database persistence (when using Docker Compose)
 VOLUME ["/app/data"]
 
+# Use entrypoint script to seed database before starting server
+ENTRYPOINT ["scripts/entrypoint.sh"]
 CMD ["uv", "run", "uvicorn", "football_player_service.app.main:app", "--host", "0.0.0.0", "--port", "8000"]
 

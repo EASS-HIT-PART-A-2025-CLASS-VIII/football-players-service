@@ -1,32 +1,58 @@
-# ⚽ Football Player Management System
+# Football Player Management System
 
-**Live:** <a href="https://football-players-service-1.onrender.com" target="_blank">https://football-players-service-1.onrender.com</a>
+A full-stack microservices app for managing football player data with AI-powered scouting reports, JWT authentication, and async task tracking.
 
-A modern full-stack web application for managing football player data with **FastAPI** backend and **React 19** frontend.
+## Features
 
----
+- CRUD for players with validation and pagination
+- JWT authentication for write operations
+- AI scouting reports generated via Gemini
+- Async task tracking with status polling
+- Docker Compose orchestration for local development
 
-## 🚀 Quick Start
+## Architecture (Short)
 
-### Prerequisites
+- Frontend calls the backend API with Axios and a JWT interceptor.
+- Backend enqueues AI scout jobs to Redis and returns a task id.
+- Worker consumes the task, calls the AI service, and saves the report.
+- Frontend polls task status and renders the report when completed.
 
-- **Backend:** Python 3.13+ with `uv` package manager
-- **Frontend:** React + Vite
-- **Docker:** (Optional) Docker & Docker Compose for containerized deployment
+## Quick Start (Docker Compose)
 
-### Option 1: Local Development (Recommended)
+1. Create a local environment file:
 
-Run both services in parallel terminals:
+```bash
+cp .env.example .env
+```
 
-**Terminal 1 - Backend:**
+On Windows, you can use `copy .env.example .env`.
+
+2. Add your `GEMINI_API_KEY` to the .env file.
+
+3. Start all services:
+
+```bash
+docker compose up --build
+```
+
+4. Open the app and log in:
+
+- Frontend: http://localhost:3000
+- Default credentials: admin / admin123
+
+For full operational details, see [docs/runbooks/compose.md](docs/runbooks/compose.md).
+
+## Local Development (Optional)
+
+Backend:
 
 ```bash
 cd backend
-uv sync --no-dev
+uv sync
 uv run python -m uvicorn football_player_service.app.main:app --reload --port 8000
 ```
 
-**Terminal 2 - Frontend:**
+Frontend:
 
 ```bash
 cd frontend
@@ -34,248 +60,118 @@ npm install
 npm run dev
 ```
 
-- **API Docs:** http://localhost:8000/docs
-- **App:** http://localhost:5173
-- **Database:** SQLite (persistent in `backend/football_players.db`)
-
-### Option 2: Docker Compose (One Command)
-
-**Recommended for running both services together with persistent database.**
+Redis:
 
 ```bash
-docker-compose up
+docker run -d -p 6379:6379 redis:alpine
 ```
 
-- **API Docs:** http://localhost:8000/docs
-- **App:** http://localhost:3000
-- **Database:** SQLite (persists in `backend-data` volume)
-
-**Stop:**
-
-```bash
-docker-compose down
-```
-
-See [Docker & Deployment](#-docker--deployment) section for advanced usage.
-
----
-
-### 📖 Documentation Structure
-
-- **[README.md](README.md)** (Root) — Project overview, quick start, architecture overview
-- **[backend/README.md](backend/README.md)** — Backend-specific: setup, API docs, testing, deployment
-- **[frontend/README.md](frontend/README.md)** — Frontend-specific: components, hooks, styling, env vars
-
----
-
-## 🔌 Communication Layer
-
-**Frontend → Backend HTTP Communication:**
-
-```
-Frontend (.env)
-  VITE_API_LOCATION = http://127.0.0.1:8000
-    ↓
-Axios Instance (src/services/api.ts)
-  baseURL = http://127.0.0.1:8000
-    ↓
-Custom Hook (src/hooks/usePlayers.ts)
-  ├ useQuery() — GET /players, GET /players/{id}
-  └ useMutation() — POST /players, PUT /players/{id}, DELETE /players/{id}
-    ↓
-FastAPI Backend
-  GET/POST/PUT/DELETE /players
-    ↓
-SQLite Database (backend/football_players.db)
-```
-
----
-
-## 📊 Tech Stack
-
-### 🎨 Frontend
-
-- **React 19** + TypeScript
-- **Vite** — Build tool
-- **TanStack Query** — Server state & caching
-- **React Router** — Navigation
-- **Zod** — Form validation
-- **Axios** — HTTP client
-
-### 🔧 Backend
-
-- **FastAPI** (Python 3.13+)
-- **SQLModel** — ORM
-- **SQLite** (local) / PostgreSQL (production)
-- **Pydantic v2** — Validation
-- **pytest** — 21 tests
-- **Rate Limiting** — slowapi (100 req/min per IP)
-
----
-
-## 🎯 Features
-
-- ✅ Full CRUD operations (Create, Read, Update, Delete players)
-- ✅ Real-time data synchronization (TanStack Query)
-- ✅ Modal forms with validation
-- ✅ Delete confirmation dialogs
-- ✅ Loading & error states
-- ✅ Type-safe frontend & backend
-- ✅ Rate limiting & security headers
-- ✅ Comprehensive test coverage (21 tests)
-- ✅ Docker containerization
-- ✅ OpenAPI/Swagger documentation
-
----
-
-## 📖 Full Documentation
-
-- **[Backend Setup & API](backend/README.md)** — Database, endpoints, testing, deployment
-- **[Frontend Setup & Architecture](frontend/README.md)** — Build, components, hooks, styling
-
----
-
-## 📚 Development Workflow
-
-### Running Tests
+Worker:
 
 ```bash
 cd backend
+uv run celery -A worker.main.celery_app worker --loglevel=info
+```
+
+AI service:
+
+```bash
+cd backend/ai_service
+pip install -r requirements.txt
+uvicorn main:app --port 8001
+```
+
+## Usage
+
+- List players: GET /players
+- Create player: POST /players (JWT required)
+- Scout player: POST /players/{id}/scout (JWT required)
+- Task status: GET /tasks/{task_id}
+
+The scout flow is async: request -> task id -> poll status -> report saved.
+
+## Hand-Off Notes (Short + Focused)
+
+This is the documentation you wish every teammate handed you:
+
+- Use [docs/runbooks/compose.md](docs/runbooks/compose.md) as the single source of truth for Docker Compose commands and troubleshooting.
+- JWT is required for writes and scouting. Use admin/admin123 after first boot.
+- The frontend polls task status every 2 seconds to show progress.
+- The demo script in [backend/scripts/demo.py](backend/scripts/demo.py) shows the full flow end-to-end.
+
+## Repository Structure (Short Map)
+
+```
+.|-- backend/
+|   |-- ai_service/
+|   |-- analytics_service/
+|   |-- data/
+|   |-- data_scraper/
+|   |-- football_player_service/
+|   |-- scripts/
+|   |-- tests/
+|   |-- worker/
+|   |-- worker_service/
+.|-- docs/
+.|-- frontend/
+.|-- docker-compose.yml
+```
+
+Explanation:
+
+- [backend/](backend/) - Python services, scripts, and tests.
+- [backend/ai_service/](backend/ai_service/) - FastAPI microservice that calls Gemini.
+- [backend/analytics_service/](backend/analytics_service/) - Empty stub; not used.
+- [backend/data/](backend/data/) - SQLite data and persisted volume.
+- [backend/data_scraper/](backend/data_scraper/) - CSV loader and helper scripts.
+- [backend/football_player_service/](backend/football_player_service/) - Main FastAPI app (models, routes, auth, DB, tests).
+- [backend/scripts/](backend/scripts/) - Demo, seeding, CSV loading, refresh job, entrypoint.
+- [backend/tests/](backend/tests/) - Extra tests outside the app package.
+- [backend/worker/](backend/worker/) - Celery worker for scout tasks.
+- [backend/worker_service/](backend/worker_service/) - Empty stub; not used.
+- [frontend/](frontend/) - React UI (components, hooks, services, styles).
+- [docs/](docs/) - Architecture notes and runbooks.
+- [docker-compose.yml](docker-compose.yml) - Service orchestration.
+
+## Documentation
+
+- [docs/EX3-notes.md](docs/EX3-notes.md) - Architecture, security, and task tracking notes.
+- [docs/runbooks/compose.md](docs/runbooks/compose.md) - Docker Compose operations and troubleshooting.
+- [backend/README.md](backend/README.md) - Backend setup and tests.
+- [frontend/README.md](frontend/README.md) - Frontend setup and build.
+
+## Testing
+
+```bash
+docker compose exec backend uv run pytest football_player_service/tests -v
+```
+
+Local (from `backend/`):
+
+```bash
 uv run pytest football_player_service/tests -v
+uv run pytest tests/test_refresh.py -v
+uv run pytest ai_service/test_main.py -v
 ```
 
-### Building for Production
+## AI Assistance
 
-```bash
-cd frontend
-npm run build    # Creates dist/ folder
-```
+This project was built with help from:
 
-### API Documentation
+- GitHub Copilot - Code completion and refactoring
+- Claude (Anthropic) - Documentation review and debugging
 
-Open http://localhost:8000/docs while backend is running
+Prompts and focus areas:
 
----
+- Review architecture and repository file structure for a clear handoff
+- Validate Docker Compose service layout and startup flow
+- Identify and document all test commands
 
-## 🐳 Docker & Deployment
+Verification:
 
-### Local Development with Docker Compose
+- Manual testing of login, CRUD, and scout flows
+- Automated pytest suite
 
-**One command to start everything:**
-
-```bash
-docker-compose up
-```
-
-**What happens:**
-
-1. **Backend** builds from [backend/football_player_service/Dockerfile](backend/football_player_service/Dockerfile)
-
-   - Runs on `http://localhost:8000`
-   - Uses SQLite database in `backend-data` volume (persisted between restarts)
-   - Automatically initializes database on startup
-   - Health check: `http://localhost:8000/health`
-
-2. **Frontend** builds from [frontend/Dockerfile](frontend/Dockerfile)
-   - Runs on `http://localhost:3000`
-   - Configured to reach backend via `http://backend:8000` (Docker network)
-   - Waits for backend to be healthy before starting
-   - Health check: HTTP status on port 3000
-
-**Logs & Management:**
-
-```bash
-# View logs from all services
-docker-compose logs -f
-
-# View backend logs only
-docker-compose logs -f backend
-
-# Stop services (keeps data)
-docker-compose down
-
-# Remove everything (clears data)
-docker-compose down -v
-```
-
-### Database Persistence
-
-The SQLite database is stored in a Docker volume (`backend-data`) so data persists between restarts:
-
-```bash
-# Check volumes
-docker volume ls
-
-# Inspect the volume
-docker volume inspect ex1_backend-data
-```
-
-To reset the database:
-
-```bash
-docker-compose down -v   # Remove volume
-docker-compose up         # New empty database
-```
-
-### Build Images Manually
-
-```bash
-# Backend
-docker build -t football-service -f backend/football_player_service/Dockerfile backend
-
-# Frontend
-docker build -t football-frontend frontend
-```
-
-### Run Individual Containers
-
-```bash
-# Backend only (port 8000)
-docker run --rm -p 8000:8000 football-service
-
-# Frontend only (port 3000)
-docker run --rm -p 3000:3000 football-frontend
-```
-
-### Customizing Docker Compose
-
-Edit [docker-compose.yml](docker-compose.yml) to:
-
-**Change ports:**
-
-```yaml
-ports:
-  - "9000:8000" # Backend on 9000 instead of 8000
-```
-
-**Use PostgreSQL instead of SQLite (production-like):**
-
-```yaml
-backend:
-  environment:
-    - DATABASE_URL=postgresql://user:pass@db:5432/football
-```
-
-**Add database service:**
-
-```yaml
-services:
-  db:
-    image: postgres:16
-    environment:
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: football
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
-
-volumes:
-  postgres-data:
-```
-
-See [backend/README.md](backend/README.md) for database configuration details.
-
----
-
-## 📄 License
+## License
 
 MIT

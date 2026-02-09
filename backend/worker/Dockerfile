@@ -17,12 +17,7 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
 
 COPY pyproject.toml ./
 
-RUN uv sync --no-dev --extra dev 
-# --extra dev helps if tests are needed, but for worker just installing deps from pyproject + worker requirements
-
-# But we added celery/redis to pyproject.toml
-# and worker/requirements.txt has them too.
-# Let's just install from pyproject.
+RUN uv sync --no-dev
 
 COPY football_player_service ./football_player_service
 COPY worker ./worker

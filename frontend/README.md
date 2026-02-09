@@ -69,11 +69,13 @@ The frontend communicates with the backend API via HTTP:
 ### Configuration Files
 
 **`.env` (Local Development):**
+
 ```
 VITE_API_LOCATION=http://127.0.0.1:8000
 ```
 
 **`.env.production` (Docker):**
+
 ```
 VITE_API_LOCATION=http://backend:8000
 ```
@@ -81,6 +83,7 @@ VITE_API_LOCATION=http://backend:8000
 ### API Service Layer
 
 [services/api.ts](src/services/api.ts) exports:
+
 - `getPlayers()` → `GET /players`
 - `getPlayer(id)` → `GET /players/{id}`
 - `createPlayer(data)` → `POST /players`
@@ -90,6 +93,7 @@ VITE_API_LOCATION=http://backend:8000
 ### Custom Hooks
 
 **`usePlayers`** — Server state management:
+
 - `playersQuery` — Fetches all players
 - `singlePlayerQuery` — Fetches single player for editing
 - `createMutation` — Creates new player
@@ -98,6 +102,7 @@ VITE_API_LOCATION=http://backend:8000
 - Auto-refetch after mutations
 
 **`usePlayersView`** — UI state management:
+
 - `isModalOpen` — Create/Edit form visibility
 - `isDeleteConfirmOpen` — Delete confirmation visibility
 - `editingId` — Currently editing player ID
@@ -217,6 +222,21 @@ Enabled in development mode — press `⌘`/`Ctrl` to toggle panel.
 2. Go to **Network** tab
 3. Perform player actions (create, edit, delete)
 4. Click on request to see request/response details
+
+---
+
+## 🤖 AI Assistance
+
+Prompts and focus areas:
+
+- UI layout and component architecture best practices
+- React + TypeScript patterns for state management and forms
+- Consistent styling and UX for modals, lists, and empty states
+
+Verification:
+
+- Manual checks of CRUD flows, loading/error/empty states, and modal UX
+- Linting with `npm run lint`
 
 ---
 

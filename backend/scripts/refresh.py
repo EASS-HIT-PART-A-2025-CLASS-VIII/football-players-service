@@ -7,6 +7,13 @@ from typing import List
 import anyio
 import redis.asyncio as redis
 from sqlmodel import Session, select
+from tenacity import (
+    retry,
+    stop_after_attempt,
+    wait_exponential,
+    retry_if_exception_type,
+    before_sleep_log
+)
 from football_player_service.app.database import engine
 from football_player_service.app.models import Player
 
@@ -17,8 +24,14 @@ logger = logging.getLogger("refresher")
 # Redis for idempotency
 REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
 
+@retry(
+    stop=stop_after_attempt(3),
+    wait=wait_exponential(multiplier=1, min=1, max=10),
+    retry=retry_if_exception_type(Exception),
+    before_sleep=before_sleep_log(logger, logging.WARNING)
+)
 async def refresh_player(player: Player, redis_client: redis.Redis):
-    """Simulate a refresh operation with idempotency."""
+    """Simulate a refresh operation with idempotency and exponential backoff retries."""
     lock_key = f"refresh_lock:{player.id}"
     
     # Check if already processed recently (Idempotency)
@@ -27,31 +40,25 @@ async def refresh_player(player: Player, redis_client: redis.Redis):
         return
 
     # Simulate network call with potential failure
-    try:
-        if random.random() < 0.2:
-            raise Exception("Simulated Network Error")
-        
-        # Update something trivial
-        logger.info(f"Refreshing Player {player.id}: {player.full_name}")
-        await asyncio.sleep(0.5) # Simulate latency
-        
-        # Mark as refreshed for 1 minute
-        await redis_client.setex(f"refreshed:{player.id}", 60, "1")
-        
-    except Exception as e:
-        logger.error(f"Failed to refresh Player {player.id}: {e}")
-        # Logic for retry could be handled by the caller or a robust library like tenacity
-        raise e
+    if random.random() < 0.2:
+        logger.warning(f"Simulated Network Error for Player {player.id} - Retrying...")
+        raise Exception("Simulated Network Error")
+    
+    # Update something trivial
+    logger.info(f"Refreshing Player {player.id}: {player.full_name}")
+    await asyncio.sleep(0.5)  # Simulate latency
+    
+    # Mark as refreshed for 1 minute
+    await redis_client.setex(f"refreshed:{player.id}", 60, "1")
 
 async def worker(queue: asyncio.Queue, redis_client: redis.Redis):
     while True:
         player = await queue.get()
         try:
             await refresh_player(player, redis_client)
-        except Exception:
-            # Simple retry logic: put back in queue? 
-            # For this demo, we just log failure.
-            pass
+        except Exception as e:
+            # After 3 retries from @retry decorator, log final failure
+            logger.error(f"Final failure for Player {player.id} after retries: {e}")
         finally:
             queue.task_done()
 

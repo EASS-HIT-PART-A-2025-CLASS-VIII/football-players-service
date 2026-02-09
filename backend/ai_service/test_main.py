@@ -1,5 +1,5 @@
 from fastapi.testclient import TestClient
-from .main import app
+from ai_service.main import app
 import os
 from unittest.mock import patch
 
@@ -10,10 +10,10 @@ def test_health():
     assert response.status_code == 200
     assert response.json() == {"status": "ok"}
 
-@patch("google.generativeai.GenerativeModel")
-def test_generate_report_mock(mock_model):
+@patch("ai_service.main.genai")
+def test_generate_report_mock(mock_genai):
     # Mock the Gemini API
-    mock_instance = mock_model.return_value
+    mock_instance = mock_genai.GenerativeModel.return_value
     mock_instance.generate_content.return_value.text = "Mocked Scouting Report"
     
     # Set API Key env var (mocked)

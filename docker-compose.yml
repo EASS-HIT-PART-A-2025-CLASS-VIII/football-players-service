@@ -8,6 +8,7 @@ services:
     environment:
       - DATABASE_URL=sqlite:////app/data/football_players.db
       - REDIS_URL=redis://redis:6379/0
+      - SECRET_KEY=${SECRET_KEY:-insecure-secret-key-for-dev}
       - ALLOWED_ORIGINS=["http://localhost:3000"]
     volumes:
       - ./backend/data:/app/data

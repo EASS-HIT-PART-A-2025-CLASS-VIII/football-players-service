@@ -114,3 +114,11 @@ class Token(SQLModel):
 class TokenData(SQLModel):
     username: Optional[str] = None
     role: Optional[str] = None
+
+class TaskStatus(SQLModel):
+    """Response model for async task status."""
+    task_id: str
+    status: str  # pending, running, completed, failed
+    result: Optional[str] = None
+    error: Optional[str] = None
+    created_at: Optional[str] = None
