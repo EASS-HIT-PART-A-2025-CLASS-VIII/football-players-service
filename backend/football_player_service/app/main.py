@@ -97,10 +97,21 @@ app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, rate_limit_exception_handler)
 app.add_exception_handler(Exception, global_exception_handler)
 
+raw_origins = os.getenv("ALLOWED_ORIGINS", "*").strip()
+if raw_origins.startswith("["):
+    try:
+        parsed_origins = json.loads(raw_origins)
+    except json.JSONDecodeError:
+        parsed_origins = [raw_origins]
+else:
+    parsed_origins = [o.strip() for o in raw_origins.split(",") if o.strip()]
+
+allow_all_origins = parsed_origins == ["*"]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"], # In production restricting this is better
-    allow_credentials=True,
+    allow_origins=parsed_origins,
+    allow_credentials=not allow_all_origins,
     allow_methods=["*"],
     allow_headers=["*"],
 )
