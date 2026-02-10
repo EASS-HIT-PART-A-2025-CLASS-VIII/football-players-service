@@ -25,8 +25,10 @@ COPY worker ./worker
 # Ensure data directory exists if it needs to access DB file
 RUN mkdir -p /app/data && chown -R appuser:appuser /app
 
+# Make entrypoint script executable
+RUN chmod +x worker/entrypoint.sh
+
 USER appuser
 
-# Worker command
-# Make sure to run from /app so python allows imports
-CMD ["uv", "run", "celery", "-A", "worker.main.celery_app", "worker", "--loglevel=info"]
+# Start a minimal HTTP server for Render port checks, then run Celery
+ENTRYPOINT ["worker/entrypoint.sh"]
