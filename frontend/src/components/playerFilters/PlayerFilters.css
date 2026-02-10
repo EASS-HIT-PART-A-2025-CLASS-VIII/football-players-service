@@ -168,6 +168,13 @@
   align-items: center;
   justify-content: center;
 }
+@media (max-width: 1280px) {
+  .player-filters {
+    height: auto;
+    min-height: 180px;
+    padding: var(--spacing-sm);
+  }
+}
 
 /* Responsive Design */
 @media (max-width: 1024px) {

@@ -18,9 +18,14 @@ interface ClearButtonProps {
   disabled?: boolean;
 }
 
-const ClearButton = ({ field, hasValue, onClear, disabled }: ClearButtonProps) => {
+const ClearButton = ({
+  field,
+  hasValue,
+  onClear,
+  disabled,
+}: ClearButtonProps) => {
   if (!hasValue) return null;
-  
+
   return (
     <button
       type="button"
@@ -54,7 +59,7 @@ const PlayerFilters = ({
   // Debounce name search
   useEffect(() => {
     const timer = setTimeout(() => {
-      if (nameInput !== filters.name) {
+      if ((nameInput || undefined) !== filters.name) {
         onFiltersChange({ ...filters, name: nameInput || undefined });
       }
     }, 300);
@@ -91,7 +96,7 @@ const PlayerFilters = ({
     } else if (field === "maxPrice") {
       setMaxPriceInput("");
     }
-    
+
     if (onClearField) {
       onClearField(field);
     } else {
@@ -123,7 +128,9 @@ const PlayerFilters = ({
     <div className="player-filters">
       <div className="filters-container">
         {/* Search Bar */}
-        <div className={`filter-group search-group ${nameInput ? 'has-value' : ''}`}>
+        <div
+          className={`filter-group search-group ${nameInput ? "has-value" : ""}`}
+        >
           <label htmlFor="search-name">Search Player</label>
           <input
             id="search-name"
@@ -134,11 +141,16 @@ const PlayerFilters = ({
             disabled={disabled}
             className="search-input"
           />
-          <ClearButton field="name" hasValue={!!nameInput} onClear={handleClearField} disabled={disabled} />
+          <ClearButton
+            field="name"
+            hasValue={!!nameInput}
+            onClear={handleClearField}
+            disabled={disabled}
+          />
         </div>
 
         {/* Country Filter */}
-        <div className={`filter-group ${filters.country ? 'has-value' : ''}`}>
+        <div className={`filter-group ${filters.country ? "has-value" : ""}`}>
           <label htmlFor="country">Country</label>
           <select
             id="country"
@@ -147,17 +159,22 @@ const PlayerFilters = ({
             disabled={disabled || !filterOptions?.countries}
           >
             <option value="">All Countries</option>
-            {filterOptions?.countries.map((country) => (
+            {(filterOptions?.countries ?? []).map((country) => (
               <option key={country} value={country}>
                 {country}
               </option>
             ))}
           </select>
-          <ClearButton field="country" hasValue={!!filters.country} onClear={handleClearField} disabled={disabled} />
+          <ClearButton
+            field="country"
+            hasValue={!!filters.country}
+            onClear={handleClearField}
+            disabled={disabled}
+          />
         </div>
 
         {/* Club Filter */}
-        <div className={`filter-group ${filters.club ? 'has-value' : ''}`}>
+        <div className={`filter-group ${filters.club ? "has-value" : ""}`}>
           <label htmlFor="club">Club</label>
           <select
             id="club"
@@ -166,17 +183,22 @@ const PlayerFilters = ({
             disabled={disabled || !filterOptions?.clubs}
           >
             <option value="">All Clubs</option>
-            {filterOptions?.clubs.map((club) => (
+            {(filterOptions?.clubs ?? []).map((club) => (
               <option key={club} value={club}>
                 {club}
               </option>
             ))}
           </select>
-          <ClearButton field="club" hasValue={!!filters.club} onClear={handleClearField} disabled={disabled} />
+          <ClearButton
+            field="club"
+            hasValue={!!filters.club}
+            onClear={handleClearField}
+            disabled={disabled}
+          />
         </div>
 
         {/* League Filter */}
-        <div className={`filter-group ${filters.league ? 'has-value' : ''}`}>
+        <div className={`filter-group ${filters.league ? "has-value" : ""}`}>
           <label htmlFor="league">League</label>
           <select
             id="league"
@@ -185,17 +207,22 @@ const PlayerFilters = ({
             disabled={disabled || !filterOptions?.leagues}
           >
             <option value="">All Leagues</option>
-            {filterOptions?.leagues.map((league) => (
+            {(filterOptions?.leagues ?? []).map((league) => (
               <option key={league} value={league}>
                 {league}
               </option>
             ))}
           </select>
-          <ClearButton field="league" hasValue={!!filters.league} onClear={handleClearField} disabled={disabled} />
+          <ClearButton
+            field="league"
+            hasValue={!!filters.league}
+            onClear={handleClearField}
+            disabled={disabled}
+          />
         </div>
 
         {/* Status Filter */}
-        <div className={`filter-group ${filters.status ? 'has-value' : ''}`}>
+        <div className={`filter-group ${filters.status ? "has-value" : ""}`}>
           <label htmlFor="status">Status</label>
           <select
             id="status"
@@ -204,17 +231,24 @@ const PlayerFilters = ({
             disabled={disabled || !filterOptions?.statuses}
           >
             <option value="">All Statuses</option>
-            {filterOptions?.statuses.map((status) => (
+            {(filterOptions?.statuses ?? []).map((status) => (
               <option key={status} value={status}>
                 {status.replace("_", " ")}
               </option>
             ))}
           </select>
-          <ClearButton field="status" hasValue={!!filters.status} onClear={handleClearField} disabled={disabled} />
+          <ClearButton
+            field="status"
+            hasValue={!!filters.status}
+            onClear={handleClearField}
+            disabled={disabled}
+          />
         </div>
 
         {/* Price Range */}
-        <div className={`filter-group price-group ${minPriceInput ? 'has-value' : ''}`}>
+        <div
+          className={`filter-group price-group ${minPriceInput ? "has-value" : ""}`}
+        >
           <label htmlFor="min-price">Min Price</label>
           <input
             id="min-price"
@@ -225,10 +259,17 @@ const PlayerFilters = ({
             disabled={disabled}
             min="0"
           />
-          <ClearButton field="minPrice" hasValue={!!minPriceInput} onClear={handleClearField} disabled={disabled} />
+          <ClearButton
+            field="minPrice"
+            hasValue={!!minPriceInput}
+            onClear={handleClearField}
+            disabled={disabled}
+          />
         </div>
 
-        <div className={`filter-group price-group ${maxPriceInput ? 'has-value' : ''}`}>
+        <div
+          className={`filter-group price-group ${maxPriceInput ? "has-value" : ""}`}
+        >
           <label htmlFor="max-price">Max Price</label>
           <input
             id="max-price"
@@ -239,7 +280,12 @@ const PlayerFilters = ({
             disabled={disabled}
             min="0"
           />
-          <ClearButton field="maxPrice" hasValue={!!maxPriceInput} onClear={handleClearField} disabled={disabled} />
+          <ClearButton
+            field="maxPrice"
+            hasValue={!!maxPriceInput}
+            onClear={handleClearField}
+            disabled={disabled}
+          />
         </div>
 
         {/* Clear Button */}
