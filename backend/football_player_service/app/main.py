@@ -1,10 +1,12 @@
 import logging
+import ssl
 import uuid
 import os
 import json
 from typing import List, Annotated, Optional
 from contextlib import asynccontextmanager
 from datetime import timedelta
+from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
 
 from fastapi import FastAPI, HTTPException, Request, status, Query, Depends
 from fastapi.responses import JSONResponse
@@ -34,12 +36,26 @@ logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
 # Initialize rate limiter
 limiter = Limiter(key_func=get_remote_address)
 
-# Celery config
-REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+# Celery config — strip ssl_cert_reqs from URL and handle SSL programmatically
+_raw_redis_url = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+_parsed = urlparse(_raw_redis_url)
+_params = parse_qs(_parsed.query)
+_params.pop("ssl_cert_reqs", None)
+REDIS_URL = urlunparse(_parsed._replace(query=urlencode(_params, doseq=True)))
+
+_use_ssl = REDIS_URL.startswith("rediss://")
+
 celery_app = Celery("ai_scout", broker=REDIS_URL, backend=REDIS_URL)
+if _use_ssl:
+    _ssl_opts = {"ssl_cert_reqs": ssl.CERT_NONE}
+    celery_app.conf.broker_use_ssl = _ssl_opts
+    celery_app.conf.redis_backend_use_ssl = _ssl_opts
 
 # Redis client for task status
-redis_client = redis.from_url(REDIS_URL, decode_responses=True)
+redis_client = redis.from_url(
+    REDIS_URL, decode_responses=True,
+    **{"ssl_cert_reqs": "none"} if _use_ssl else {}
+)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

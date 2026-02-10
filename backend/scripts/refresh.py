@@ -3,6 +3,7 @@ import os
 import random
 import logging
 from typing import List
+from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
 
 import anyio
 import redis.asyncio as redis
@@ -21,8 +22,12 @@ from football_player_service.app.models import Player
 logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger("refresher")
 
-# Redis for idempotency
-REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+# Redis for idempotency — strip ssl_cert_reqs from URL
+_raw_redis_url = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+_parsed = urlparse(_raw_redis_url)
+_params = parse_qs(_parsed.query)
+_params.pop("ssl_cert_reqs", None)
+REDIS_URL = urlunparse(_parsed._replace(query=urlencode(_params, doseq=True)))
 
 @retry(
     stop=stop_after_attempt(3),
@@ -65,7 +70,8 @@ async def worker(queue: asyncio.Queue, redis_client: redis.Redis):
 async def main():
     logger.info("Starting Async Refresh Job")
     
-    r = redis.from_url(REDIS_URL)
+    _ssl_kw = {"ssl_cert_reqs": "none"} if REDIS_URL.startswith("rediss://") else {}
+    r = redis.from_url(REDIS_URL, **_ssl_kw)
     
     # Fetch players
     # Note: SQLModel sync session used in async context for simplicity (step 09 often uses async session but sync is fine for script entry)

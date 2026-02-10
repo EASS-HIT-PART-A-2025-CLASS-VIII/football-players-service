@@ -1,5 +1,7 @@
 import os
+import ssl
 import time
+from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
 from celery import Celery
 from sqlmodel import Session
 from football_player_service.app.database import engine
@@ -13,8 +15,17 @@ try:
 except ImportError:
     HAS_GEMINI = False
 
-REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+_raw_redis_url = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+_parsed = urlparse(_raw_redis_url)
+_params = parse_qs(_parsed.query)
+_params.pop("ssl_cert_reqs", None)
+REDIS_URL = urlunparse(_parsed._replace(query=urlencode(_params, doseq=True)))
+
 celery_app = Celery("ai_scout", broker=REDIS_URL, backend=REDIS_URL)
+if REDIS_URL.startswith("rediss://"):
+    _ssl_opts = {"ssl_cert_reqs": ssl.CERT_NONE}
+    celery_app.conf.broker_use_ssl = _ssl_opts
+    celery_app.conf.redis_backend_use_ssl = _ssl_opts
 
 @celery_app.task(name="ai_scout.generate_report")
 def generate_report(player_id: int):

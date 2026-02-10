@@ -1,7 +1,9 @@
 import os
+import ssl
 import requests
 import sys
 import json
+from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
 from celery import Celery
 from sqlmodel import Session, select
 import redis
@@ -12,11 +14,27 @@ sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 from football_player_service.app.models import Player
 from football_player_service.app.database import engine
 
-REDIS_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+# Strip ssl_cert_reqs from URL and handle SSL programmatically
+_raw_redis_url = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+_parsed = urlparse(_raw_redis_url)
+_params = parse_qs(_parsed.query)
+_params.pop("ssl_cert_reqs", None)
+REDIS_URL = urlunparse(_parsed._replace(query=urlencode(_params, doseq=True)))
+
 AI_SERVICE_URL = os.getenv("AI_SERVICE_URL", "http://ai-service:8000")
 
+_use_ssl = REDIS_URL.startswith("rediss://")
+
 celery_app = Celery("ai_scout", broker=REDIS_URL, backend=REDIS_URL)
-redis_client = redis.from_url(REDIS_URL, decode_responses=True)
+if _use_ssl:
+    _ssl_opts = {"ssl_cert_reqs": ssl.CERT_NONE}
+    celery_app.conf.broker_use_ssl = _ssl_opts
+    celery_app.conf.redis_backend_use_ssl = _ssl_opts
+
+redis_client = redis.from_url(
+    REDIS_URL, decode_responses=True,
+    **{"ssl_cert_reqs": "none"} if _use_ssl else {}
+)
 
 @celery_app.task(name="ai_scout.generate_report", bind=True)
 def generate_report(self, player_id: int):
