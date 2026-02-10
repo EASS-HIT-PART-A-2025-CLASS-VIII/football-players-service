@@ -135,7 +135,7 @@ Explanation:
 
 ## Documentation
 
-- [docs/EX3-notes.md](docs/EX3-notes.md) - Architecture, security, and task tracking notes.
+- [docs/ai-scout-notes.md](docs/ai-scout-notes.md) - AI scout pipeline notes.
 - [docs/runbooks/compose.md](docs/runbooks/compose.md) - Docker Compose operations and troubleshooting.
 - [backend/README.md](backend/README.md) - Backend setup and tests.
 - [frontend/README.md](frontend/README.md) - Frontend setup and build.
