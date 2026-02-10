@@ -62,7 +62,6 @@ async def lifespan(app: FastAPI):
     """Lifespan event handler for startup and shutdown."""
     database.init_db()
     
-    # Seed admin user (required for EX3)
     session_provider = app.dependency_overrides.get(
         database.get_session,
         database.get_session,
@@ -83,7 +82,7 @@ async def lifespan(app: FastAPI):
         session_generator.close()
 
     logger.info("=" * 60)
-    logger.info("⚽ Football Player Service v0.3.0 (EX3)")
+    logger.info("⚽ Football Player Service v0.3.0")
     logger.info("🔒 JWT authentication enabled")
     logger.info("📡 Task tracking enabled via Redis")
     yield

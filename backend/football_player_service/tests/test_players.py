@@ -354,7 +354,7 @@ def test_security_headers_present(client):
     assert response.headers["x-frame-options"] == "DENY"
 
 
-# === Authentication Tests (EX3 Requirement) ===
+# === Authentication Tests ===
 
 def test_login_with_valid_credentials_returns_token(client):
     """Login with valid credentials returns JWT token."""

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Complete EX3 Full-Stack Microservices Demo Script
+Complete Full-Stack Microservices Demo Script
 
 This script provides a comprehensive demonstration of the Football Player Service:
 
@@ -47,7 +47,7 @@ BASE_URL = "http://localhost:8000"
 POLL_INTERVAL = 2  # seconds
 MAX_POLLS = 30  # 60 seconds max wait
 
-# Default admin credentials (EX3 requirement)
+# Default admin credentials
 ADMIN_USERNAME = "admin"
 ADMIN_PASSWORD = "admin123"
 
@@ -188,7 +188,7 @@ def show_access_info():
     print("   4. Watch real-time progress indicator")
     
     print("\n📋 **Architecture details:**")
-    print("   • View complete docs: docs/EX3-notes.md")
+    print("   • View complete docs: docs/ai-scout-notes.md")
     print("   • Test endpoints: http://localhost:8000/docs")
 
 
@@ -376,9 +376,9 @@ def get_player_report(player_id: int) -> Optional[str]:
 
 
 def main():
-    """Run the complete EX3 Full-Stack Microservices Demo."""
+    """Run the complete Full-Stack Microservices Demo."""
     print("🔵" * 30)
-    print("\n🚀 EX3 Full-Stack Microservices Demo")
+    print("\n🚀 Full-Stack Microservices Demo")
     print("   Football Player Service with AI Scout & Async Workers")
     
     # Ask user if they want to start services
@@ -458,7 +458,7 @@ def main():
     print("   • Frontend UI: http://localhost:3000")
     print("   • Try manual scout: Click 🔍 on any player") 
     print("   • API docs: http://localhost:8000/docs")
-    print("   • Full architecture: docs/EX3-notes.md")
+    print("   • Full architecture: docs/ai-scout-notes.md")
     
     print("\n" + "🔵" * 30 + "\n")
 

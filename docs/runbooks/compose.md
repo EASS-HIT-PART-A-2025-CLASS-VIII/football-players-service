@@ -158,7 +158,8 @@ docker compose exec backend python scripts/load_csv_data.py --reset --limit 200
 - Username: `admin`
 - Password: `admin123`
 
-The admin user is automatically created on first startup. All write operations (create, update, delete, scout) require JWT authentication per EX3 requirements.
+The admin user is automatically created on first startup.
+All write operations (create, update, delete, scout) require JWT authentication.
 
 ### Test the Complete AI Scout Flow
 
@@ -257,11 +258,11 @@ Expected output:
 
 ```
 NAME                   STATUS    PORTS
-ex1-backend-1          Up        0.0.0.0:8000->8000/tcp
-ex1-frontend-1         Up        0.0.0.0:3000->3000/tcp
-ex1-redis-1            Up        0.0.0.0:6379->6379/tcp
-ex1-worker-1           Up
-ex1-ai-service-1       Up        0.0.0.0:8001->8000/tcp
+football-players-service-backend-1          Up        0.0.0.0:8000->8000/tcp
+football-players-service-frontend-1         Up        0.0.0.0:3000->3000/tcp
+football-players-service-redis-1            Up        0.0.0.0:6379->6379/tcp
+football-players-service-worker-1           Up
+football-players-service-ai-service-1       Up        0.0.0.0:8001->8000/tcp
 ```
 
 ### Monitor Worker Task Processing
