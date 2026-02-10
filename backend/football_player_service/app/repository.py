@@ -39,6 +39,7 @@ class PlayerRepository:
         if max_price is not None:
             query = query.where(Player.market_value <= max_price)
         
+        query = query.order_by(Player.id)
         return self.session.exec(query).all()
 
     def count(
